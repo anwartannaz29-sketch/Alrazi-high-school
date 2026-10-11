@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الثانوية التأهيلية الرازي – تارجيست</title>
+<meta name="description" content="البوابة الرقمية للثانوية التأهيلية الرازي بتارجيست، إقليم الحسيمة: الإعلانات، الأخبار، استعمال الزمن، الدروس والموارد، الحياة المدرسية والمعرض.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="الثانوية التأهيلية الرازي – تارجيست">
+<meta property="og:description" content="الإعلانات والأخبار واستعمال الزمن والدروس والحياة المدرسية بالثانوية التأهيلية الرازي.">
+<meta property="og:image" content="assets/images/garden-heart-960.webp">
+<!-- TODO: og:image يحتاج رابطًا مطلقًا بعد النشر (https://الدومين/assets/images/garden-heart-960.webp) -->
+<meta name="theme-color" content="#1d4f91">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"HighSchool","name":"الثانوية التأهيلية الرازي","alternateName":"Lycée Qualifiant Al-Razi","address":{"@type":"PostalAddress","addressLocality":"تارجيست","addressCountry":"MA"},"hasMap":"https://maps.app.goo.gl/ifFLYfBmavofSJ8B9"}
+</script>
+<script>try{var d=document.documentElement,t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');d.dataset.theme=t;if(localStorage.getItem('lang')==='fr'){d.lang='fr';d.dir='ltr'}}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<a class="skip" href="#main">تخطي إلى المحتوى</a>
+
+<header class="header" id="header">
+  <div class="wrap header__in">
+    <a class="brand" href="#top" aria-label="الثانوية التأهيلية الرازي – الرئيسية">
+      <!-- TODO: الشعار الرسمي -->
+      <span class="brand__logo" aria-hidden="true">ر</span>
+      <span class="brand__name">الثانوية التأهيلية الرازي</span>
+    </a>
+    <nav id="nav" class="nav" aria-label="التنقل الرئيسي"></nav>
+    <div class="tools">
+      <button class="btn-icon" id="langBtn" type="button" aria-label="تغيير اللغة"><span id="langLabel">FR</span></button>
+      <button class="btn-icon" id="themeBtn" type="button" aria-label="تبديل الوضع الليلي"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" id="top" aria-label="مقدمة">
+    <div class="hero__media" id="heroMedia"></div>
+    <div class="wrap hero__in">
+      <p class="hero__kicker" data-i18n="heroKicker">تارجيست · إقليم الحسيمة</p>
+      <h1>الثانوية التأهيلية الرازي<small>تارجيست</small></h1>
+      <p class="hero__tag" data-i18n="heroTag">فضاء للتعلم، الإبداع، والتميز</p>
+      <div class="hero__cta">
+        <a class="btn btn--accent" href="#about" data-i18n="heroBtn1">اكتشف المؤسسة</a>
+        <a class="btn btn--ghost" href="#news" data-i18n="heroBtn2">آخر الأخبار</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="quick wrap" aria-label="وصول سريع"><div class="quick__grid" id="quick"></div></section>
+
+  <section class="section today" id="today">
+    <div class="wrap">
+      <div class="head"><h2>اليوم في الرازي</h2><span class="demo" id="demoToday"></span></div>
+      <div class="today__grid" id="todayGrid"></div>
+    </div>
+  </section>
+
+  <section class="section" id="news">
+    <div class="wrap">
+      <div class="head"><h2>أهم الأخبار</h2></div>
+      <div class="topnews" id="topNews"></div>
+      <div class="split">
+        <div>
+          <div class="head head--sub"><h2>آخر المستجدات</h2></div>
+          <ol class="feed" id="feed"></ol>
+        </div>
+        <div id="announcements">
+          <div class="head head--sub"><h2>الإعلانات</h2></div>
+          <div class="ann" id="annList"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tint" id="about">
+    <div class="wrap about">
+      <div class="about__text">
+        <h2>عن المؤسسة</h2>
+        <p>تقع الثانوية التأهيلية الرازي في تارجيست بإقليم الحسيمة بالمغرب.</p>
+        <p>سيتم نشر التعريف الرسمي بالمؤسسة ورسالتها قريبًا.</p>
+        <!-- TODO: إضافة معلومات الإدارة والتعريف الرسمي -->
+      </div>
+      <div class="about__media" id="aboutMedia"></div>
+    </div>
+  </section>
+
+  <section class="section" id="life">
+    <div class="wrap">
+      <div class="head"><h2>الحياة المدرسية</h2></div>
+      <div class="grid grid--3" id="actGrid"></div>
+      <div class="head head--sub"><h2>أندية المؤسسة</h2></div>
+      <!-- TODO: تأكيد أسماء الأندية رسميًا -->
+      <div class="chips-row" id="clubs"></div>
+    </div>
+  </section>
+
+  <section class="section section--tint" id="resources">
+    <div class="wrap">
+      <div class="head"><h2>الدروس والموارد</h2><span class="demo" id="demoRes"></span></div>
+      <div class="panel">
+        <div class="chips" id="resLevels" role="tablist" aria-label="المستوى"></div>
+        <div class="chips chips--sm" id="resSubjects" aria-label="المادة"></div>
+        <div class="filters">
+          <input type="search" id="resSearch" placeholder="ابحث عن درس أو تمرين…" aria-label="بحث في الموارد">
+          <select id="resType" aria-label="نوع المورد"></select>
+        </div>
+        <p class="crumb" id="resCrumb"></p>
+        <ul class="list" id="resList"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="schedule">
+    <div class="wrap">
+      <div class="head"><h2>استعمال الزمن</h2><span class="demo" id="demoSch"></span></div>
+      <div class="panel">
+        <div class="selects">
+          <label>المستوى<select id="schLevel"></select></label>
+          <label>القسم<select id="schClass"></select></label>
+        </div>
+        <div class="chips chips--sm" id="schDays" aria-label="اليوم"></div>
+        <ul class="sessions" id="schList"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tint" id="teachers">
+    <div class="wrap">
+      <div class="head"><h2>أساتذة وأطر المؤسسة</h2><span class="demo" id="demoTea"></span></div>
+      <div class="filters"><input type="search" id="teaSearch" placeholder="ابحث بالاسم…" aria-label="بحث"><select id="teaSubject" aria-label="المادة"></select></div>
+      <div class="grid grid--4" id="teaGrid"></div>
+    </div>
+  </section>
+
+  <section class="section" id="achievements">
+    <div class="wrap">
+      <div class="head"><h2>إنجازات المؤسسة</h2></div>
+      <p class="note">تُنشر الإنجازات بعد توثيقها رسميًا.</p>
+      <div class="grid grid--3" id="achGrid"></div>
+    </div>
+  </section>
+
+  <section class="section section--tint" id="gallery">
+    <div class="wrap">
+      <div class="head"><h2>المعرض</h2></div>
+      <div class="chips chips--sm" id="galCats" aria-label="تصنيف الصور"></div>
+      <div class="masonry" id="galGrid"></div>
+    </div>
+  </section>
+
+  <section class="section" id="facilities">
+    <div class="wrap">
+      <div class="head"><h2>مرافق المؤسسة</h2></div>
+      <div class="grid grid--3" id="facGrid"></div>
+    </div>
+  </section>
+
+  <section class="section section--tint" id="contact">
+    <div class="wrap loc">
+      <div>
+        <h2>أين توجد المؤسسة؟</h2>
+        <p id="addr"></p>
+        <a class="btn btn--primary" id="mapBtn" target="_blank" rel="noopener">فتح الموقع في Google Maps</a>
+        <h2 class="mt">التواصل</h2>
+        <dl class="contact" id="contactList"></dl>
+      </div>
+      <div class="map" id="mapBox"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer__in">
+    <div><strong>الثانوية التأهيلية الرازي</strong><p id="footAddr"></p></div>
+    <nav id="footNav" class="footer__nav" aria-label="روابط التذييل"></nav>
+  </div>
+  <p class="copy">© <span id="year"></span> الثانوية التأهيلية الرازي – تارجيست</p>
+</footer>
+
+<nav class="bottom" id="bottom" aria-label="التنقل السريع"></nav>
+<dialog id="sheet" class="sheet" aria-label="القائمة"><div class="sheet__in"><button class="sheet__x" type="button" aria-label="إغلاق">✕</button><div id="sheetLinks"></div></div></dialog>
+
+<dialog id="lightbox" class="lb" aria-label="عرض الصورة">
+  <div class="lb__bar"><span id="lbCount"></span><span><button type="button" class="lb__fs" aria-label="ملء الشاشة">⛶</button><button type="button" class="lb__x" aria-label="إغلاق">✕</button></span></div>
+  <button class="lb__nav lb__prev" type="button" aria-label="السابقة">›</button>
+  <figure id="lbFig"><img id="lbImg" alt=""><figcaption id="lbCap"></figcaption></figure>
+  <button class="lb__nav lb__next" type="button" aria-label="التالية">‹</button>
+</dialog>
+<dialog id="article" class="art" aria-label="الخبر"><div class="art__in"><button type="button" class="art__x" aria-label="إغلاق">✕</button><div id="articleBody"></div></div></dialog>
+<noscript><p style="padding:1rem;text-align:center">يحتاج هذا الموقع إلى JavaScript لعرض المحتوى.</p></noscript>
+
+<script src="data/site.js"></script>
+<script src="data/news.js"></script>
+<script src="data/announcements.js"></script>
+<script src="data/activities.js"></script>
+<script src="data/teachers.js"></script>
+<script src="data/schedule.js"></script>
+<script src="data/resources.js"></script>
+<script src="data/gallery.js"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
