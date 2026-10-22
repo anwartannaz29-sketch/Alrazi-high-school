@@ -41,16 +41,17 @@
     if (o.admin && !token) { const e = new Error("expired"); e.code = "SESSION_EXPIRED"; throw e; }
     // المفتاح الجديد (sb_publishable_…) ليس JWT فلا يُرسل في Authorization؛ المفتاح القديم (anon JWT) يُرسل كما هو.
     const h = { apikey: KEY, Accept: "application/json" }; const bearer = token || (KEY.split(".").length === 3 ? KEY : null); if (bearer) h.Authorization = `Bearer ${bearer}`;
-    if (o.body) { h["Content-Type"] = "application/json"; h.Prefer = "return=representation"; }
+    if (o.body !== undefined) { h["Content-Type"] = "application/json"; h.Prefer = o.prefer || "return=representation"; }
     if (o.count) { h.Prefer = "count=exact"; h.Range = "0-0"; }
     const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 12000);
     try {
-      const r = await fetch(`${URL_}/rest/v1/${path}`, { method: o.method || "GET", headers: h, body: o.body ? JSON.stringify(o.body) : undefined, signal: ctl.signal });
+      const r = await fetch(`${URL_}/rest/v1/${path}`, { method: o.method || "GET", headers: h, body: o.body !== undefined ? JSON.stringify(o.body) : undefined, signal: ctl.signal });
       if (r.status === 401 && o.admin) { setSession(null); const e = new Error("expired"); e.code = "SESSION_EXPIRED"; throw e; }
       if (!r.ok) { const e = new Error("rest"); e.status = r.status; e.detail = await r.json().catch(() => ({})); throw e; }
       if (o.count) return +(r.headers.get("content-range") || "*/0").split("/")[1] || 0;
       return r.status === 204 ? null : r.json();
     } finally { clearTimeout(to); }
   };
+  SB.url = URL_; SB.key = KEY; SB.token = freshToken;   // للرفع إلى Storage (يستعمله admin-cms.js)
   window.SB = SB;
 })();

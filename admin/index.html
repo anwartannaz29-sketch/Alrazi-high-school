@@ -4,9 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1D4F91">
 <title>لوحة الإدارة – الثانوية التأهيلية الرازي</title>
 <script src="/js/theme-init.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/fonts.css">
 <link rel="stylesheet" href="/css/styles.css">
 <link rel="stylesheet" href="/css/admin.css">
 </head>
@@ -31,22 +33,32 @@
     <strong>لوحة الإدارة</strong>
     <nav class="adm__tabs" id="tabs" aria-label="أقسام الإدارة">
       <button type="button" data-tab="dash" aria-pressed="true">الرئيسية</button>
+      <button type="button" data-tab="timetables" aria-pressed="false">استعمال الزمن</button>
       <button type="button" data-tab="news" aria-pressed="false">الأخبار</button>
       <button type="button" data-tab="announcements" aria-pressed="false">الإعلانات</button>
+      <button type="button" data-tab="resources" aria-pressed="false">الدروس والملفات</button>
+      <button type="button" data-tab="teachers" aria-pressed="false">الأساتذة</button>
+      <button type="button" data-tab="gallery" aria-pressed="false">المعرض</button>
+      <button type="button" data-tab="life" aria-pressed="false">الأنشطة والأندية</button>
+      <button type="button" data-tab="achievements" aria-pressed="false">الإنجازات</button>
+      <button type="button" data-tab="settings" aria-pressed="false">معلومات المؤسسة</button>
     </nav>
-    <span class="adm__user"><a class="link" href="/" target="_blank" rel="noopener">الموقع</a><button type="button" class="btn btn--sm btn--ghost-dark" id="logoutBtn">خروج</button></span>
+    <span class="adm__user"><a class="link" href="/" target="_blank" rel="noopener">الموقع</a><button type="button" class="btn btn--sm btn--outline" id="logoutBtn">خروج</button></span>
   </header>
   <main class="wrap adm__main" id="view" aria-live="polite"></main>
 </div>
 
 <dialog id="formDlg" class="adlg"><form id="form" novalidate><h2 id="formTitle"></h2><p id="formMsg" class="msg" role="alert" hidden></p><div id="formFields"></div>
-  <div class="adlg__a"><button class="btn btn--primary" id="saveBtn" type="submit">حفظ</button><button class="btn btn--ghost-dark" type="button" id="cancelBtn">إلغاء</button></div></form></dialog>
+  <div class="adlg__a"><button class="btn btn--primary" id="saveBtn" type="submit">حفظ</button><button class="btn btn--outline" type="button" id="cancelBtn">إلغاء</button></div></form></dialog>
 <dialog id="confirmDlg" class="adlg adlg--sm"><form method="dialog"><h2>تأكيد الحذف</h2><p id="confirmText"></p>
-  <div class="adlg__a"><button class="btn btn--danger" value="yes">نعم، احذف</button><button class="btn btn--ghost-dark" value="no">إلغاء</button></div></form></dialog>
+  <div class="adlg__a"><button class="btn btn--danger" value="yes">نعم، احذف</button><button class="btn btn--outline" value="no">إلغاء</button></div></form></dialog>
 <div id="toasts" class="toasts" aria-live="polite"></div>
 
 <script src="/js/config.js"></script>
 <script src="/js/supabase.js"></script>
+<script src="/js/timetable-view.js"></script>
 <script src="/js/admin.js"></script>
+<script src="/js/admin-tt.js"></script>
+<script src="/js/admin-cms.js"></script>
 </body>
 </html>

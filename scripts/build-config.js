@@ -28,4 +28,13 @@ if (isHosted) {
 }
 const cfg = { SUPABASE_URL: url, SUPABASE_ANON_KEY: key, DEMO: !isHosted && demo };
 fs.writeFileSync(out, `/* مولَّد آليًا بواسطة scripts/build-config.js — لا تعدّله يدويًا. يحتوي المفتاح العام فقط. */\nwindow.RAZI_CONFIG = ${JSON.stringify(cfg)};\n`);
+// ---- sitemap.xml + robots.txt (يحتاج دومينًا مطلقًا: SITE_URL أو دومين Vercel الإنتاجي) ----
+const root = env.SEO_OUT_DIR || path.join(__dirname, "..");
+const site = (env.SITE_URL || (env.VERCEL_PROJECT_PRODUCTION_URL ? "https://" + env.VERCEL_PROJECT_PRODUCTION_URL : "")).replace(/\/+$/, "");
+if (site && !/^https:\/\/[a-z0-9.-]+$/i.test(site)) fail("SITE_URL غير صالح (المتوقع https://example.com بدون مسار).");
+const robots = "User-agent: *\nDisallow: /admin/\n" + (site ? `Sitemap: ${site}/sitemap.xml\n` : "");
+fs.writeFileSync(path.join(root, "robots.txt"), robots);
+const smPath = path.join(root, "sitemap.xml");
+if (site) fs.writeFileSync(smPath, `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${["/", "/about.html", "/privacy.html"].map(u => `  <url><loc>${site}${u}</loc></url>`).join("\n")}\n</urlset>\n`);
+else if (fs.existsSync(smPath)) fs.unlinkSync(smPath);
 console.log("✔", path.basename(out), `(supabase: ${url ? "yes" : "no"}, demo: ${cfg.DEMO})`);

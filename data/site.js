@@ -41,6 +41,10 @@ RAZI.bottomNav = ["top", "news", "resources", "schedule"];
 
 /* TODO: ترجمة فرنسية كاملة لاحقًا. المفاتيح الناقصة تعود للعربية. */
 RAZI.i18n = {
-  ar: { more: "المزيد", close: "إغلاق", heroKicker: "تارجيست · إقليم الحسيمة", heroTag: "فضاء للتعلم، الإبداع، والتميز", heroBtn1: "اكتشف المؤسسة", heroBtn2: "آخر الأخبار", soon: "سيتم تحديث المعلومات قريبًا", readMore: "اقرأ المزيد", share: "مشاركة", copied: "تم نسخ الرابط", demo: "تجريبي" },
-  fr: { more: "Plus", close: "Fermer", heroKicker: "Targuist · Province d'Al Hoceïma", heroTag: "Un espace d'apprentissage, de créativité et d'excellence", heroBtn1: "Découvrir l'établissement", heroBtn2: "Dernières actualités", soon: "Informations bientôt disponibles", readMore: "Lire la suite", share: "Partager", copied: "Lien copié", demo: "Démo" }
+  ar: { heroTitle: "هنا تُبنى المعرفة، ويُصنع المستقبل", heroDesc: "الثانوية التأهيلية الرازي بتارجيست، فضاء للتعلّم والطموح وتنمية القدرات.", svcTitle: "الخدمات المدرسية", aboutMore: "اعرف أكثر عن المؤسسة", more: "المزيد", close: "إغلاق", heroKicker: "تارجيست · إقليم الحسيمة", heroTag: "فضاء للتعلم، الإبداع، والتميز", heroBtn1: "اكتشف مؤسستنا", heroBtn2: "الخدمات المدرسية", soon: "سيتم تحديث المعلومات قريبًا", readMore: "اقرأ المزيد", share: "مشاركة", copied: "تم نسخ الرابط", demo: "تجريبي" },
+  fr: { heroTitle: "Ici se construit le savoir, ici se façonne l'avenir", heroDesc: "Lycée Qualifiant Al-Razi à Targuist, un espace d'apprentissage, d'ambition et de développement des compétences.", svcTitle: "Services scolaires", aboutMore: "En savoir plus sur l'établissement", more: "Plus", close: "Fermer", heroKicker: "Targuist · Province d'Al Hoceïma", heroTag: "Un espace d'apprentissage, de créativité et d'excellence", heroBtn1: "Découvrir notre établissement", heroBtn2: "Services scolaires", soon: "Informations bientôt disponibles", readMore: "Lire la suite", share: "Partager", copied: "Lien copié", demo: "Démo" }
 };
+
+/* إحصائيات المؤسسة — لا تُعرض إلا الأرقام الموثقة.
+   Model: { label, value, source, confirmed: true }  — TODO: أضف فقط أرقامًا رسمية معتمدة (مثال: {label:"عدد الأقسام", value:..., source:"مذكرة رسمية", confirmed:true}) */
+RAZI.stats = [];
