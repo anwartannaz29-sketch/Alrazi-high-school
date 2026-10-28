@@ -1,0 +1,19 @@
+{
+  "name": "razi-school-site",
+  "private": true,
+  "version": "3.1.0",
+  "description": "موقع الثانوية التأهيلية الرازي — HTML/CSS/JS ثابت + Supabase. لا اعتماديات.",
+  "scripts": {
+    "build": "node scripts/build-config.js",
+    "test:build": "node tests/build.test.js",
+    "test:e2e": "python tests/e2e.py",
+    "test:supabase": "node tests/supabase.integration.mjs",
+    "fonts": "node scripts/fetch-fonts.js",
+    "test:design": "python tests/design-lint.py && python tests/contrast.py",
+    "test:cms": "python tests/e2e_cms.py",
+    "test:all": "npm run test:build && npm run test:design && npm run test:e2e && npm run test:cms"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
