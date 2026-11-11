@@ -3,6 +3,7 @@
   const $ = (s, r = document) => r.querySelector(s);
   const root = document.documentElement;
   const R = window.RAZI;
+  const X = s => (window.V8 ? window.V8.X(s) : s);   // ترجمة نص عربي إلى اللغة الحالية (data/i18n.js)
 
   /* ---------- طبقة البيانات (جاهزة للربط بـ Backend لاحقًا) ---------- */
   /* تعقيم: كل نص قادم من قاعدة البيانات يُهرَّب قبل أن يدخل أي قالب HTML */
@@ -50,7 +51,7 @@
     award: '<circle cx="12" cy="9" r="5"/><path d="M9 13l-2 8 5-3 5 3-2-8"/>', megaphone: '<path d="M4 10v4h3l8 4V6L7 10zM18 9a4 4 0 0 1 0 6"/>',
     inbox: '<path d="M4 13l2-8h12l2 8M4 13v6h16v-6M4 13h5l1 2h4l1-2h5"/>', arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
     plus: '<path d="M12 5v14M5 12h14"/>', external: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>', check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>', alert: '<path d="M12 4l9 16H3zM12 10v4M12 17v.5"/>',
-    cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>', share: '<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 11l7.6-4M8.2 13l7.6 4"/>', file: '<path d="M6 3h8l4 4v14H6zM14 3v4h4"/>'
+    cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>', share: '<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 11l7.6-4M8.2 13l7.6 4"/>', file: '<path d="M6 3h8l4 4v14H6zM14 3v4h4"/>', spark: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>'
   };
   /* نظام أيقونات واحد: شبكة 24، خط 1.75، مقاسات 16/20/24/32 فقط */
   const SZ = [16, 20, 24, 32], snap = n => SZ.reduce((a, b) => (Math.abs(b - n) < Math.abs(a - n) ? b : a));
@@ -66,7 +67,7 @@
       return `<picture class="pic ${o.cls || ""}" style="--lq:#c9d4df;--pos:50% 50%;aspect-ratio:${o.ratio || "16/10"}"><img src="${id}" alt="${o.alt ?? ""}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onload="this.parentNode.classList.add('on')" onerror="this.onerror=null;this.src='${FALLBACK}';this.parentNode.classList.add('on')"></picture>`;
     }
     const im = R.images[id];
-    if (!im) return `<div class="ph" role="img" aria-label="صورة قريبًا"><span>${ico("image", 30)}</span></div>`;
+    if (!im) return `<div class="ph" role="img" aria-label="${X("صورة قريبًا")}"><span>${ico("image", 30)}</span></div>`;
     const set = f => [480, 960, 1600].map(w => `assets/images/${f}-${w}.webp ${w}w`).join(", ");
     const mob = im.mobile ? `<source media="(max-width: 640px)" srcset="assets/images/${im.mobile}-480.webp 480w, assets/images/${im.mobile}-960.webp 960w" sizes="100vw">` : "";
     const style = `--lq:${im.bg};--pos:${im.pos};` + (o.ratio ? `aspect-ratio:${o.ratio};` : `aspect-ratio:${im.w}/${im.h};`);
@@ -79,10 +80,10 @@
   const loc = lang => (lang === "fr" ? "fr-FR" : "ar-MA-u-nu-latn");
   const fmt = d => new Date(d).toLocaleDateString(loc(lang), { day: "numeric", month: "long", year: "numeric" });
   const dayDiff = d => Math.round((new Date(new Date().toDateString()) - new Date(new Date(d).toDateString())) / 864e5);
-  const group = d => { const n = dayDiff(d); return n <= 0 ? "اليوم" : n === 1 ? "أمس" : n < 7 ? "هذا الأسبوع" : "قبل ذلك"; };
+  const group = d => { const n = dayDiff(d); return n <= 0 ? "نُشر اليوم" : n === 1 ? "أمس" : n < 7 ? "هذا الأسبوع" : "قبل ذلك"; };
   const demoTag = x => (x.demo ? `<span class="tag tag--demo">${t("demo")}</span>` : "");
   const EMPTY = { news: ["لا توجد أخبار منشورة حاليًا", "ستظهر الأخبار هنا فور نشرها من إدارة المؤسسة."], ann: ["لا توجد إعلانات حاليًا", "تُعرض هنا الإعلانات الرسمية السارية فقط."] };
-  const empty = (hint, title) => `<div class="empty"><span class="empty__i">${ico("inbox", 24)}</span>${title ? `<b>${title}</b>` : ""}<small>${hint || ""}</small></div>`;
+  const empty = (hint, title) => `<div class="empty"><span class="empty__i">${ico("inbox", 24)}</span>${title ? `<b>${X(title)}</b>` : ""}<small>${X(hint || "")}</small></div>`;
   const share = async (title, url = location.href) => {
     try { if (navigator.share) return await navigator.share({ title, url }); await navigator.clipboard.writeText(url); toast(t("copied")); } catch (e) {}
   };
@@ -91,11 +92,11 @@
 
   /* ---------- Navigation ---------- */
   function renderNav() {
-    const links = R.nav.map(n => `<a href="#${n.id}" data-sec="${n.id}">${n[lang]}</a>`).join("");
+    const hr = n => n.href || "#" + n.id, links = R.nav.map(n => `<a href="${hr(n)}" data-sec="${n.id}"${n.ai ? ' class="nav__ai"' : ""}>${n[lang]}</a>`).join("");
     $("#nav").innerHTML = links; $("#footNav").innerHTML = links;
     const b = R.bottomNav.map(id => R.nav.find(n => n.id === id));
-    $("#bottom").innerHTML = b.map(n => `<a href="#${n.id}" data-sec="${n.id}">${ico(n.icon)}<span>${n[lang].split(" ")[0]}</span></a>`).join("") + `<button type="button" id="moreBtn" aria-haspopup="dialog">${ico("menu")}<span>${t("more")}</span></button>`;
-    $("#sheetLinks").innerHTML = R.nav.filter(n => !R.bottomNav.includes(n.id)).map(n => `<a href="#${n.id}">${ico(n.icon)}${n[lang]}</a>`).join("");
+    $("#bottom").innerHTML = b.map(n => `<a href="${hr(n)}" data-sec="${n.id}">${ico(n.icon)}<span>${n[lang].split(" ")[0]}</span></a>`).join("") + `<button type="button" id="moreBtn" aria-haspopup="dialog">${ico("menu")}<span>${t("more")}</span></button>`;
+    $("#sheetLinks").innerHTML = R.nav.filter(n => !R.bottomNav.includes(n.id)).map(n => `<a href="${hr(n)}">${ico(n.icon)}${n[lang]}</a>`).join("");
     $("#moreBtn").onclick = () => $("#sheet").showModal();
   }
 
@@ -109,10 +110,10 @@
     const pin = ann.find(a => a.pinned) || ann.sort(byDate)[0];
     const lastNews = [...news].sort(byDate)[0], lastRes = [...res].sort(byDate)[0], nextEv = [...ev].sort((a, b) => new Date(a.date) - new Date(b.date))[0];
     const today = WD[new Date().getDay()] === "الأحد" ? "الاثنين" : WD[new Date().getDay()];
-    const card = (i, label, body, href) => `<a class="tc" href="${href}"><span class="tc__i">${ico(i)}</span><small>${label}</small><b>${body}</b></a>`;
+    const card = (i, label, body, href) => `<a class="tc" href="${href}"><span class="tc__i">${ico(i)}</span><small>${X(label)}</small><b>${body}</b></a>`;
     const cards = [];   // لا تُعرض إلا البطاقات التي لها بيانات فعلية؛ وإن لم توجد يختفي القسم كله
     if (pin) cards.push(card("megaphone", "آخر إعلان", pin.title, "#announcements"));
-    if (await ttAvail()) cards.push(card("clock", "استعمال الزمن", `حصص ${today}`, "#schedule"));
+    if (await ttAvail()) cards.push(card("clock", "استعمال الزمن", `${X("حصص")} ${X(today)}`, "#schedule"));
     if (lastNews) cards.push(card("news", "آخر خبر", lastNews.title, "#news"));
     if (nextEv) cards.push(card("cal", "أقرب نشاط", `${nextEv.title} · ${fmt(nextEv.date)}`, "#life"));
     if (lastRes) cards.push(card("book", "آخر مورد دراسي", lastRes.title, "#resources"));
@@ -135,12 +136,12 @@
     /* Feed زمني */
     const groups = {};
     [...news].sort(byDate).forEach(n => (groups[group(n.date)] ||= []).push(n));
-    $("#feed").innerHTML = Object.entries(groups).map(([g, items]) => `<li class="fg"><h3>${g}</h3><ul>${items.map(n => `<li><time datetime="${n.date}">${fmt(n.date)}</time><span class="tag">${n.category}</span><a href="${n.url}">${n.title}</a></li>`).join("")}</ul></li>`).join("") || empty(EMPTY.news[1], EMPTY.news[0]);
+    $("#feed").innerHTML = Object.entries(groups).map(([g, items]) => `<li class="fg"><h3>${X(g)}</h3><ul>${items.map(n => `<li><time datetime="${n.date}">${fmt(n.date)}</time><span class="tag">${n.category}</span><a href="${n.url}">${n.title}</a></li>`).join("")}</ul></li>`).join("") || empty(EMPTY.news[1], EMPTY.news[0]);
 
     /* الإعلانات: المثبّت أولًا */
     const ordered = [...ann].sort((a, b) => (b.pinned - a.pinned) || byDate(a, b));
-    $("#annList").innerHTML = ordered.map(a => `<article class="an ${a.pinned ? "an--pin" : ""}"><div class="meta"><span class="tag tag--${a.pinned ? "accent" : "type"}">${a.pinned ? ico("pin", 14) + " " : ""}${a.type}</span><time datetime="${a.date}">${fmt(a.date)}</time>${demoTag(a)}</div><h3>${a.title}</h3><p>${a.body}</p>${a.file ? `<a class="link" href="${a.file}" download>تحميل الوثيقة</a>` : ""}</article>`).join("") || empty(EMPTY.ann[1], EMPTY.ann[0]);
-    const errBox = what => `<div class="empty err" role="alert">تعذّر تحميل ${what} حاليًا. <button type="button" class="btn btn--sm btn--primary" data-retry>إعادة المحاولة</button></div>`;
+    $("#annList").innerHTML = ordered.map(a => `<article class="an ${a.pinned ? "an--pin" : ""}"><div class="meta"><span class="tag tag--${a.pinned ? "accent" : "type"}">${a.pinned ? ico("pin", 14) + " " : ""}${a.type}</span><time datetime="${a.date}">${fmt(a.date)}</time>${demoTag(a)}</div><h3>${a.title}</h3><p>${a.body}</p>${a.file ? `<a class="link" href="${a.file}" download>${X("تحميل الوثيقة")}</a>` : ""}</article>`).join("") || empty(EMPTY.ann[1], EMPTY.ann[0]);
+    const errBox = what => `<div class="empty err" role="alert">${lang === "fr" ? `Impossible de charger ${what === "الأخبار" ? "les actualités" : "les annonces"} pour le moment.` : `تعذّر تحميل ${what} حاليًا.`} <button type="button" class="btn btn--sm btn--primary" data-retry>${X("إعادة المحاولة")}</button></div>`;
     if (api.err.news) { $("#topNews").innerHTML = errBox("الأخبار"); $("#feed").innerHTML = ""; }
     if (api.err.announcements) $("#annList").innerHTML = errBox("الإعلانات");
   }
@@ -154,8 +155,8 @@
       ["book", "الدروس والموارد", "دروس وتمارين وملخصات حسب المستوى والمادة", "#resources", "resources"], ["users", "الأندية والأنشطة", "الحياة المدرسية والأندية", "#life", "life"],
       ["trophy", "الإنجازات", "الجوائز والمشاركات الموثقة", "#achievements", "achievements"], ["school", "المؤسسة والتواصل", "معلومات المؤسسة وبيانات التواصل", "#about", "about"]];
     $("#svcGrid").innerHTML = S.map(([i, ti, d, href, k]) => `<div class="sv-w">${A[k]
-      ? `<a class="sv" href="${href}"><span class="sv__i">${ico(i, 24)}</span><h3>${ti}</h3><span class="sv__arr"><span class="flip">${ico("arrow", 20)}</span></span><p>${d}</p></a>`
-      : `<div class="sv sv--off" aria-disabled="true"><span class="sv__i">${ico(i, 24)}</span><h3>${ti}</h3><span class="tag">قريبًا</span><p>${d}</p></div>`}</div>`).join("");
+      ? `<a class="sv" href="${href}"><span class="sv__i">${ico(i, 24)}</span><h3>${X(ti)}</h3><span class="sv__arr"><span class="flip">${ico("arrow", 20)}</span></span><p>${X(d)}</p></a>`
+      : `<div class="sv sv--off" aria-disabled="true"><span class="sv__i">${ico(i, 24)}</span><h3>${X(ti)}</h3><span class="tag">${X("قريبًا")}</span><p>${X(d)}</p></div>`}</div>`).join("");
   }
   /* ---------- إحصائيات: فقط الأرقام الموثقة (confirmed:true) ---------- */
   function renderStats() {
@@ -176,27 +177,27 @@
     $("#clubs").innerHTML = !clubs.length ? empty("تُعرض الأندية هنا بعد اعتماد أسمائها رسميًا.", "أندية المؤسسة") : clubs.map(c => `<div class="club">${ico(c.icon, 20)}<div><b>${c.name}</b><small>${c.text}</small></div></div>`).join("");
     $("#achGrid").innerHTML = !ach.length ? empty("تُنشر هنا الجوائز والمسابقات والنتائج والمشاريع والتكريمات والمشاركات بعد توثيقها رسميًا.", "إنجازات المؤسسة") : R.achievementKinds.map(k => {
       const items = ach.filter(a => a.kind === k.kind);
-      return `<article class="card card--ico"><span class="ico">${ico(k.icon, 26)}</span><h3>${k.kind}</h3><p>${items.length ? items.map(i => i.title).join("، ") : "سيتم النشر بعد التوثيق الرسمي."}</p></article>`;
+      return `<article class="card card--ico"><span class="ico">${ico(k.icon, 26)}</span><h3>${X(k.kind)}</h3><p>${items.length ? items.map(i => i.title).join(lang === "fr" ? ", " : "، ") : X("سيتم النشر بعد التوثيق الرسمي.")}</p></article>`;
     }).join("");
-    $("#facGrid").innerHTML = !fac.length ? empty("تُعرض المرافق هنا بعد توثيقها بالصور.", "مرافق المؤسسة") : fac.map(f => `<article class="card card--fac">${f.image ? pic(f.image, { ratio: "4/3", sizes: "(min-width:900px) 30vw, 100vw" }) : `<div class="ph" role="img" aria-label="صورة قريبًا"><span>${ico("image", 30)}</span></div>`}<div class="card__b"><h3>${f.name}</h3><p>${f.text}</p></div></article>`).join("");
+    $("#facGrid").innerHTML = !fac.length ? empty("تُعرض المرافق هنا بعد توثيقها بالصور.", "مرافق المؤسسة") : fac.map(f => `<article class="card card--fac">${f.image ? pic(f.image, { ratio: "4/3", sizes: "(min-width:900px) 30vw, 100vw" }) : `<div class="ph" role="img" aria-label="${X("صورة قريبًا")}"><span>${ico("image", 30)}</span></div>`}<div class="card__b"><h3>${f.name}</h3><p>${f.text}</p></div></article>`).join("");
   }
 
   /* ---------- الدروس والموارد: المستوى ← المادة ← النوع ← الملف ---------- */
   async function renderResources() {
-    const items = await api.list("resources");
+    const items = await api.list("resources"); fresh("#resPanel");
     const lvName = id => (R.schedule.levels.find(l => l.id === id) || { name: id }).name, levels = [...new Set(items.map(i => i.levelId))].map(id => ({ id, name: lvName(id) }));
-    if (!items.length) { $("#resLevels").closest(".panel").innerHTML = empty("ستظهر الدروس والتمارين والملخصات هنا مصنفة حسب المستوى والمادة عند نشرها.", "الدروس والموارد"); return; }
+    if (!items.length) { $("#resPanel").innerHTML = empty("ستظهر الدروس والتمارين والملخصات هنا مصنفة حسب المستوى والمادة عند نشرها.", "الدروس والموارد"); return; }
     const st = { level: levels[0].id, subject: "all", type: "all", q: "" };
     $("#demoRes").textContent = items.some(i => i.demo) ? R.site.demoNotice : "";
-    $("#resType").innerHTML = `<option value="all">كل الأنواع</option>` + R.resourceTypes.map(x => `<option>${x}</option>`).join("");
-    const chip = (v, l, on) => `<button type="button" class="chip" data-v="${esc(v)}" aria-pressed="${on}">${esc(l)}</button>`;
+    $("#resType").innerHTML = `<option value="all">${X("كل الأنواع")}</option>` + R.resourceTypes.map(x => `<option value="${x}">${X(x)}</option>`).join("");
+    const chip = (v, l, on) => `<button type="button" class="chip" data-v="${esc(v)}" aria-pressed="${on}">${esc(X(l))}</button>`;
     const draw = () => {
       $("#resLevels").innerHTML = levels.map(l => chip(l.id, l.name, l.id === st.level)).join("");
       const subs = [...new Set(items.filter(i => i.levelId === st.level).map(i => i.subject))];
       $("#resSubjects").innerHTML = chip("all", "كل المواد", st.subject === "all") + subs.map(s => chip(s, s, s === st.subject)).join("");
       const res = items.filter(i => i.levelId === st.level && (st.subject === "all" || i.subject === st.subject) && (st.type === "all" || i.type === st.type) && String(i.title).includes(st.q));
-      $("#resCrumb").textContent = [levels.find(l => l.id === st.level).name, st.subject === "all" ? "كل المواد" : st.subject, st.type === "all" ? "كل الأنواع" : st.type].join(" ‹ ");
-      $("#resList").innerHTML = res.map(r => `<li class="ri"><span class="ri__i">${ico("file")}</span><div><b>${r.title}</b><small>${esc(r.subject)}${r.unit ? " · " + esc(r.unit) : ""} · <span class="tag">${esc(r.type)}</span></small></div>${r.file ? `<a class="btn btn--primary btn--sm" href="${r.file}" download>تحميل</a>` : `<span class="soon">قريبًا</span>`}</li>`).join("") || empty("جرّب تغيير الفلتر أو كلمات البحث.", "لا توجد نتائج");
+      $("#resCrumb").textContent = [X(levels.find(l => l.id === st.level).name), X(st.subject === "all" ? "كل المواد" : st.subject), X(st.type === "all" ? "كل الأنواع" : st.type)].join(lang === "fr" ? " › " : " ‹ ");
+      $("#resList").innerHTML = res.map(r => `<li class="ri"><span class="ri__i">${ico("file")}</span><div><b>${r.title}</b><small>${esc(X(r.subject))}${r.unit ? " · " + esc(X(r.unit)) : ""} · <span class="tag">${esc(X(r.type))}</span></small></div>${r.file ? `<a class="btn btn--primary btn--sm" href="${r.file}" download>${X("تحميل")}</a>` : `<span class="soon">${X("قريبًا")}</span>`}</li>`).join("") || empty("جرّب تغيير الفلتر أو كلمات البحث.", "لا توجد نتائج");
     };
     $("#resLevels").onclick = e => { const b = e.target.closest("[data-v]"); if (b) { st.level = b.dataset.v; st.subject = "all"; draw(); } };
     $("#resSubjects").onclick = e => { const b = e.target.closest("[data-v]"); if (b) { st.subject = b.dataset.v; draw(); } };
@@ -208,9 +209,9 @@
   /* ---------- استعمال الزمن ---------- */
   /* استعمال الزمن المنشور من قاعدة البيانات: مستوى ← قسم ← يوم + شبكة أسبوعية + طباعة/PDF. لا مسودات (RLS) ولا بيانات تجريبية. */
   async function renderScheduleLive() {
-    const panel = $("#schLevel").closest(".panel");
+    const panel = fresh("#schPanel");
     let tts; try { tts = await SB.rest("timetables?select=id,school_year,level,class_name,days,notes&status=eq.published&order=school_year.desc,level.asc,class_name.asc&limit=300"); }
-    catch (e) { panel.innerHTML = `<div class="empty err" role="alert">تعذّر تحميل استعمال الزمن حاليًا. <button type="button" class="btn btn--sm btn--primary" data-retry-sch>إعادة المحاولة</button></div>`; panel.querySelector("[data-retry-sch]").onclick = () => location.reload(); return; }
+    catch (e) { panel.innerHTML = `<div class="empty err" role="alert">${lang === "fr" ? "Impossible de charger l'emploi du temps pour le moment." : "تعذّر تحميل استعمال الزمن حاليًا."} <button type="button" class="btn btn--sm btn--primary" data-retry-sch>${X("إعادة المحاولة")}</button></div>`; panel.querySelector("[data-retry-sch]").onclick = () => location.reload(); return; }
     if (!tts.length) { panel.innerHTML = empty("سيظهر استعمال الزمن هنا بعد نشره من إدارة المؤسسة.", "لا يوجد استعمال زمن منشور"); return; }
     const levels = [...new Set(tts.map(x => x.level))], cache = {};
     const st = { level: levels[0], tt: null, day: null };
@@ -224,8 +225,8 @@
       $("#schDays").innerHTML = [...st.tt.days].sort((a, b) => a - b).map(d => `<button type="button" class="chip" data-v="${d}" aria-pressed="${d === st.day}">${TT.DAYS[d]}</button>`).join("");
       try {
         const d = await detail(st.tt); $("#schList").innerHTML = TT.dayHTML(st.tt, d.periods, d.entries, st.day).html; $("#schGrid").innerHTML = TT.gridHTML(st.tt, d.periods, d.entries);
-        $("#schInfo").textContent = `السنة الدراسية ${st.tt.school_year}`; $("#schPrint").onclick = () => TT.print(st.tt, d.periods, d.entries);
-      } catch (e) { $("#schList").innerHTML = `<li class="empty err" role="alert">تعذّر تحميل تفاصيل الجدول. حاول مجددًا.</li>`; }
+        $("#schInfo").textContent = `${X("السنة الدراسية")} ${st.tt.school_year}`; $("#schPrint").onclick = () => TT.print(st.tt, d.periods, d.entries);
+      } catch (e) { $("#schList").innerHTML = `<li class="empty err" role="alert">${X("تعذّر تحميل تفاصيل الجدول. حاول مجددًا.")}</li>`; }
     }
     $("#schLevel").onchange = e => { st.level = e.target.value; st.tt = null; draw(); };
     $("#schClass").onchange = e => { st.tt = tts.find(x => x.id === e.target.value); st.day = pickDay(st.tt); draw(); };
@@ -234,18 +235,18 @@
   }
   async function renderSchedule() {
     if (live) return renderScheduleLive();
-    const S = await api.obj("schedule"), teachers = await api.list("teachers");
-    if (S.demo && !DEMO) { $("#schLevel").closest(".panel").innerHTML = empty("سيظهر استعمال الزمن هنا بعد اعتماده رسميًا من الإدارة.", "استعمال الزمن"); return; }
+    const S = await api.obj("schedule"), teachers = await api.list("teachers"); fresh("#schPanel");
+    if (S.demo && !DEMO) { fresh("#schPanel").innerHTML = empty("سيظهر استعمال الزمن هنا بعد اعتماده رسميًا من الإدارة.", "استعمال الزمن"); return; }
     const st = { level: S.levels[0].id, cls: null, day: S.days[Math.max(0, new Date().getDay() - 1)] || S.days[0] };
     $("#demoSch").textContent = S.demo ? R.site.demoNotice : "";
-    $("#schLevel").innerHTML = S.levels.map(l => `<option value="${l.id}">${l.name}</option>`).join("");
+    $("#schLevel").innerHTML = S.levels.map(l => `<option value="${l.id}">${X(l.name)}</option>`).join("");
     const draw = () => {
       const cl = S.classes.filter(c => c.levelId === st.level);
       if (!cl.find(c => c.id === st.cls)) st.cls = cl[0].id;
-      $("#schClass").innerHTML = cl.map(c => `<option value="${c.id}" ${c.id === st.cls ? "selected" : ""}>${c.name}</option>`).join("");
-      $("#schDays").innerHTML = S.days.map(d => `<button type="button" class="chip" data-v="${d}" aria-pressed="${d === st.day}">${d}</button>`).join("");
+      $("#schClass").innerHTML = cl.map(c => `<option value="${c.id}" ${c.id === st.cls ? "selected" : ""}>${X(c.name)}</option>`).join("");
+      $("#schDays").innerHTML = S.days.map(d => `<button type="button" class="chip" data-v="${d}" aria-pressed="${d === st.day}">${X(d)}</button>`).join("");
       const rows = S.entries.filter(e => e.classId === st.cls && e.day === st.day).sort((a, b) => a.slot - b.slot);
-      $("#schList").innerHTML = rows.map(e => `<li class="ss"><div class="ss__t"><b>${S.slots[e.slot - 1].time}</b><small>الحصة ${e.slot}</small></div><div class="ss__m"><b>${e.subject}</b><small>${(teachers.find(t => t.id === e.teacherId) || {}).name || "—"} · ${e.room}</small></div></li>`).join("") || empty("لا توجد حصص مسجلة لهذا اليوم.", "لا حصص");
+      $("#schList").innerHTML = rows.map(e => `<li class="ss"><div class="ss__t"><b>${S.slots[e.slot - 1].time}</b><small>${X("الحصة")} ${e.slot}</small></div><div class="ss__m"><b>${X(e.subject)}</b><small>${(teachers.find(t => t.id === e.teacherId) || {}).name || "—"} · ${String(e.room).replace("قاعة", X("قاعة"))}</small></div></li>`).join("") || empty("لا توجد حصص مسجلة لهذا اليوم.", "لا حصص");
     };
     $("#schLevel").onchange = e => { st.level = e.target.value; draw(); };
     $("#schClass").onchange = e => { st.cls = e.target.value; draw(); };
@@ -258,10 +259,10 @@
     const all = await api.list("teachers");
     if (!all.length) { $("#teaSearch").closest(".filters").hidden = true; $("#teaGrid").innerHTML = empty("تُعرض أسماء الأساتذة والأطر هنا بعد اعتماد القائمة من الإدارة.", "أساتذة وأطر المؤسسة"); return; }
     $("#demoTea").textContent = DEMO ? R.site.demoNotice : "";
-    $("#teaSubject").innerHTML = `<option value="all">كل المواد</option>` + [...new Set(all.map(t => t.subject))].map(s => `<option>${s}</option>`).join("");
+    $("#teaSubject").innerHTML = `<option value="all">${X("كل المواد")}</option>` + [...new Set(all.map(t => t.subject))].map(s => `<option value="${esc(s)}">${esc(X(s))}</option>`).join("");
     const draw = () => {
       const s = $("#teaSubject").value, q = $("#teaSearch").value.trim();
-      $("#teaGrid").innerHTML = all.filter(t => (s === "all" || t.subject === s) && t.name.includes(q)).map(t => `<article class="card tcard"><div class="av">${t.photo ? pic(t.photo, { ratio: "1/1", sizes: "120px" }) : ico("users", 34)}</div><h3>${t.name}</h3><p>${t.subject}</p><small>${t.role}</small></article>`).join("") || empty("جرّب تغيير الفلتر أو كلمات البحث.", "لا توجد نتائج");
+      $("#teaGrid").innerHTML = all.filter(t => (s === "all" || t.subject === s) && t.name.includes(q)).map(t => `<article class="card tcard"><div class="av">${t.photo ? pic(t.photo, { ratio: "1/1", sizes: "120px" }) : ico("users", 34)}</div><h3>${t.name}</h3><p>${X(t.subject)}</p><small>${X(t.role)}</small></article>`).join("") || empty("جرّب تغيير الفلتر أو كلمات البحث.", "لا توجد نتائج");
     };
     $("#teaSubject").onchange = draw; $("#teaSearch").oninput = draw; draw();
   }
@@ -273,13 +274,13 @@
     let cat = "all", shown = items, cur = 0;
     const cats = ["all", ...R.galleryCategories];
     const draw = () => {
-      $("#galCats").innerHTML = cats.map(c => `<button type="button" class="chip" data-v="${c}" aria-pressed="${c === cat}">${c === "all" ? "الكل" : c}</button>`).join("");
+      $("#galCats").innerHTML = cats.map(c => `<button type="button" class="chip" data-v="${c}" aria-pressed="${c === cat}">${X(c === "all" ? "الكل" : c)}</button>`).join("");
       shown = items.filter(i => cat === "all" || i.category === cat);
-  $("#galGrid").innerHTML = api.err.gallery ? `<div class="empty err" role="alert"><b>تعذّر تحميل المعرض حاليًا</b><button type="button" class="btn btn--sm btn--primary" data-retry-gal>إعادة المحاولة</button></div>`
+  $("#galGrid").innerHTML = api.err.gallery ? `<div class="empty err" role="alert"><b>${X("تعذّر تحميل المعرض حاليًا")}</b><button type="button" class="btn btn--sm btn--primary" data-retry-gal>${X("إعادة المحاولة")}</button></div>`
       : shown.map((g, i) => `<button type="button" class="mi" data-i="${i}" aria-label="${g.caption}">${pic(g.image, { sizes: "(min-width:900px) 30vw, 50vw", alt: g.caption, ratio: g.live ? "auto" : undefined })}</button>`).join("") || empty("تُضاف صور هذا التصنيف عند توفرها.", "لا توجد صور في هذا التصنيف");
     };
     $("#galCats").onclick = e => { const b = e.target.closest("[data-v]"); if (b) { cat = b.dataset.v; draw(); } };
-    $("#galGrid").addEventListener("click", e => { if (e.target.closest("[data-retry-gal]")) renderGallery(); });
+    if (!$("#galGrid")._b) { $("#galGrid")._b = 1; $("#galGrid").addEventListener("click", e => { if (e.target.closest("[data-retry-gal]")) renderGallery(); }); }
     const lb = $("#lightbox"), img = $("#lbImg");
     const show = i => {
       cur = (i + shown.length) % shown.length; const g = shown[cur], src = x => (/^https?:\/\//.test(x.image) ? x.image : `assets/images/${R.images[x.image].file}-1600.webp`);
@@ -290,11 +291,14 @@
     const prev = () => show(cur - 1), next = () => show(cur + 1);
     $(".lb__prev").onclick = prev; $(".lb__next").onclick = next; $(".lb__x").onclick = () => lb.close();
     $(".lb__fs").onclick = () => (document.fullscreenElement ? document.exitFullscreen() : lb.requestFullscreen?.());
-    lb.addEventListener("keydown", e => { if (e.key === "ArrowLeft") next(); if (e.key === "ArrowRight") prev(); });
-    lb.addEventListener("click", e => e.target === lb && lb.close());
-    let x0 = null;   // Swipe
-    $("#lbFig").addEventListener("pointerdown", e => (x0 = e.clientX));
-    $("#lbFig").addEventListener("pointerup", e => { if (x0 === null) return; const dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 50) (dx < 0 ? next : prev)(); });
+    let x0 = null;   // Swipe — تُربط المستمعات مرة واحدة فقط (يعاد رسم المعرض عند تبديل اللغة)
+    if (!lb._b) { lb._b = 1;
+      lb.addEventListener("keydown", e => { if (e.key === "ArrowLeft") lb._next(); if (e.key === "ArrowRight") lb._prev(); });
+      lb.addEventListener("click", e => e.target === lb && lb.close());
+      $("#lbFig").addEventListener("pointerdown", e => (x0 = e.clientX));
+      $("#lbFig").addEventListener("pointerup", e => { if (x0 === null) return; const dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 50) (dx < 0 ? lb._next : lb._prev)(); });
+    }
+    lb._next = next; lb._prev = prev;
     draw();
   }
 
@@ -312,29 +316,29 @@
   function renderContact() {
     const s = R.site, addr = s.addressOverride || `${s.city} – ${s.province} – ${s.country}`;
     $("#addr").textContent = addr; $("#footAddr").textContent = addr; $("#mapBtn").href = s.mapsLink;
-    $("#mapBox").innerHTML = s.mapsEmbed ? `<iframe src="${esc(s.mapsEmbed)}" title="خريطة المؤسسة" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>` : `<a href="${s.mapsLink}" target="_blank" rel="noopener">${ico("pin", 34)}<span>${esc(addr)}</span></a>`;
-    const row = (l, v, link) => `<div><dt>${l}</dt><dd>${v ? (link ? `<a href="${link}${encodeURI(v)}">${esc(v)}</a>` : esc(v)) : t("soon")}</dd></div>`;
-    const ext = (l, u) => `<div><dt>${l}</dt><dd>${u ? `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(l === "الموقع" ? u.replace(/^https:\/\//, "") : "فتح الصفحة")}</a>` : t("soon")}</dd></div>`;
+    $("#mapBox").innerHTML = s.mapsEmbed ? `<iframe src="${esc(s.mapsEmbed)}" title="${X("خريطة المؤسسة")}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>` : `<a href="${s.mapsLink}" target="_blank" rel="noopener">${ico("pin", 34)}<span>${esc(addr)}</span></a>`;
+    const row = (l, v, link) => `<div><dt>${X(l)}</dt><dd>${v ? (link ? `<a href="${link}${encodeURI(v)}">${esc(v)}</a>` : esc(v)) : t("soon")}</dd></div>`;
+    const ext = (l, u) => `<div><dt>${X(l)}</dt><dd>${u ? `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(l === "الموقع" ? u.replace(/^https:\/\//, "") : X("فتح الصفحة"))}</a>` : t("soon")}</dd></div>`;
     $("#contactList").innerHTML = row("الهاتف", s.phone, "tel:") + row("البريد", s.email, "mailto:") + row("العنوان", addr) + ext("Facebook", s.facebook) + (s.instagram ? ext("Instagram", s.instagram) : "") + (s.youtube ? ext("YouTube", s.youtube) : "") + ext("الموقع", s.website);
-    const p2 = $("#aboutP2"); if (p2 && s.aboutText) { p2.textContent = s.aboutText; p2.style.whiteSpace = "pre-line"; }
+    const p2 = $("#aboutP2"); if (p2 && s.aboutText) { p2.removeAttribute("data-x"); p2.textContent = s.aboutText; p2.style.whiteSpace = "pre-line"; }
     $("#year").textContent = new Date().getFullYear();
   }
 
 
   /* ---------- قراءة الخبر (نص عادي فقط: textContent، لا HTML) ---------- */
   async function openArticle(id) {
-    const dlg = $("#article"), box = $("#articleBody"); box.textContent = "جارٍ التحميل…"; dlg.showModal();
+    const dlg = $("#article"), box = $("#articleBody"); box.textContent = X("جارٍ التحميل…"); dlg.showModal();
     try {
       const rows = live ? await SB.rest(`news?select=title,excerpt,content,image_url,category,published_at&id=eq.${encodeURIComponent(id)}&status=eq.published`) : [];
-      const n = rows[0]; if (!n) { box.textContent = "هذا الخبر غير متاح."; return; }
+      const n = rows[0]; if (!n) { box.textContent = X("هذا الخبر غير متاح."); return; }
       box.replaceChildren();
       const mk = (tag, txt, cls) => { const e = document.createElement(tag); e.textContent = txt; if (cls) e.className = cls; box.append(e); return e; };
-      mk("span", n.category || "خبر", "tag"); mk("h2", n.title);
-      const sh = mk("button", "مشاركة الخبر", "btn btn--sm btn--outline"); sh.type = "button"; sh.onclick = () => share(n.title, location.origin + location.pathname + "#news/" + encodeURIComponent(id));
+      mk("span", X(n.category || "خبر"), "tag"); mk("h2", n.title);
+      const sh = mk("button", X("مشاركة الخبر"), "btn btn--sm btn--outline"); sh.type = "button"; sh.onclick = () => share(n.title, location.origin + location.pathname + "#news/" + encodeURIComponent(id));
       mk("time", fmt(n.published_at), "art__date");
       const u = safeUrl(n.image_url); if (u) { const im = document.createElement("img"); im.src = n.image_url; im.alt = ""; im.referrerPolicy = "no-referrer"; im.className = "art__img"; box.append(im); }
       (n.content || n.excerpt || "").split(/\n{2,}/).forEach(par => par.trim() && mk("p", par.trim(), "art__p"));
-    } catch (e) { box.textContent = "تعذّر تحميل الخبر. حاول لاحقًا."; }
+    } catch (e) { box.textContent = X("تعذّر تحميل الخبر. حاول لاحقًا."); }
   }
 
   /* ---------- Reveal + scroll-spy + UI ---------- */
@@ -350,8 +354,6 @@
     R.nav.forEach(n => { const el = document.getElementById(n.id); if (el) spy.observe(el); });
   }
   function bindUI() {
-    const syncTheme = () => $("#themeBtn").setAttribute("aria-pressed", String(root.dataset.theme === "dark"));
-    $("#themeBtn").onclick = () => { const n = root.dataset.theme === "dark" ? "light" : "dark"; root.dataset.theme = n; root.style.backgroundColor = n === "dark" ? "#0C1624" : "#F5F8FC"; localStorage.setItem("theme", n); syncTheme(); }; syncTheme();
     // ميل ثلاثي الأبعاد خفيف لبطاقات الخدمات (ماوس فقط، ويُعطَّل مع تقليل الحركة)
     if (matchMedia("(hover: hover) and (pointer: fine)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
       const g = $("#svcGrid");
@@ -359,7 +361,6 @@
       g.addEventListener("pointermove", e => { const w = e.target.closest(".sv-w"), c = w && w.querySelector("a.sv"); if (!c) return; const r = w.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5; c.style.setProperty("--ry", (x * 7).toFixed(2) + "deg"); c.style.setProperty("--rx", (-y * 5).toFixed(2) + "deg"); });
       g.addEventListener("pointerout", e => { const w = e.target.closest(".sv-w"), c = w && w.querySelector("a.sv"); if (c && !w.contains(e.relatedTarget)) { c.style.removeProperty("--rx"); c.style.removeProperty("--ry"); } });
     }
-    $("#langBtn").onclick = () => { lang = lang === "ar" ? "fr" : "ar"; localStorage.setItem("lang", lang); applyLang(); renderNav(); };
     $(".sheet__x").onclick = () => $("#sheet").close();
     $("#article .art__x").onclick = () => { $("#article").close(); history.replaceState(null, "", "#news"); };
     document.addEventListener("click", e => {
@@ -373,7 +374,16 @@
   function applyLang() {
     root.lang = lang; root.dir = lang === "fr" ? "ltr" : "rtl"; $("#langLabel").textContent = lang === "ar" ? "FR" : "AR";
     document.querySelectorAll("[data-i18n]").forEach(el => (el.textContent = t(el.dataset.i18n)));
+    if (window.V8) V8.translate();
   }
+  /* حاوية لوحة تُستعاد لحالتها الأصلية قبل كل رسم (لأن الحالة الفارغة تستبدل محتواها) */
+  function fresh(sel) { const p = $(sel); if (!p) return document.createElement("div"); p._orig = p._orig || p.innerHTML; p.innerHTML = p._orig; return p; }
+  /* تبديل اللغة: يعيد رسم كل الأقسام الديناميكية بالنص الجديد */
+  addEventListener("razi:lang", async e => {
+    lang = e.detail; applyLang(); renderNav(); renderContact();
+    await Promise.all([renderServices(), renderHome(), renderLife(), renderResources(), renderSchedule(), renderTeachers(), renderGallery()]);
+    renderStats(); observe(); if (window.V8) V8.translate();
+  });
 
   (async () => {
     if (DEMO) { const b = document.createElement("div"); b.className = "demo-bar"; b.textContent = "وضع تجريبي محلي — بيانات غير رسمية"; document.body.prepend(b); }

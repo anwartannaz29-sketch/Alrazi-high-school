@@ -1,13 +1,15 @@
-/* page.js — غلاف الصفحات الداخلية (about / privacy): تنقل، وضع ليلي، تذييل. يعتمد على data/site.js */
+/* page.js (V8) — غلاف الصفحات الداخلية (about / privacy / assistant): تنقل، تذييل، عنوان. الثيم واللغة في ui.js. يعتمد على data/site.js */
 (() => {
-  const R = window.RAZI, $ = s => document.querySelector(s), root = document.documentElement;
-  const links = R.nav.map(n => `<a href="index.html#${n.id}">${n.ar}</a>`).join("");
-  $("#nav").innerHTML = links; $("#footNav").innerHTML = links;
-  $("#themeBtn").onclick = () => { const n = root.dataset.theme === "dark" ? "light" : "dark"; root.dataset.theme = n; $("#themeBtn").setAttribute("aria-pressed", String(n === "dark")); root.style.backgroundColor = n === "dark" ? "#0C1624" : "#F5F8FC"; try { localStorage.setItem("theme", n); } catch (e) {} };
-  const a = `${R.site.city} – ${R.site.province} – ${R.site.country}`; document.querySelectorAll("[data-addr]").forEach(e => (e.textContent = a));
+  const R = window.RAZI, $ = s => document.querySelector(s);
+  const draw = () => {
+    const lang = document.documentElement.lang === "fr" ? "fr" : "ar", hr = n => n.href || `index.html#${n.id}`;
+    const links = R.nav.map(n => `<a href="${hr(n)}"${n.ai ? ' class="nav__ai"' : ""}>${n[lang]}</a>`).join("");
+    $("#nav").innerHTML = links; $("#footNav").innerHTML = links;
+    const a = `${window.V8.X(R.site.city)} – ${window.V8.X(R.site.province)} – ${window.V8.X(R.site.country)}`; document.querySelectorAll("[data-addr]").forEach(e => (e.textContent = a));
+  };
   document.querySelectorAll("[data-map]").forEach(e => (e.href = R.site.mapsLink));
-  $("#themeBtn").setAttribute("aria-pressed", String(root.dataset.theme === "dark"));
   $("#year").textContent = new Date().getFullYear();
+  draw(); addEventListener("razi:lang", draw);
   addEventListener("scroll", () => $("#header").classList.toggle("scrolled", scrollY > 8), { passive: true });
   // نص «عن المؤسسة» من لوحة الإدارة (إن وُجد) يحلّ محل الحالة الفارغة
   const box = document.getElementById("aboutBox");

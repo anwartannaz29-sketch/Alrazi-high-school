@@ -1,14 +1,13 @@
-[hidden] { display: none !important; }
 /* ===== Tokens — كل الألوان والخطوط من هنا فقط =====
-   الأخضر المؤسسي #054494 · الذهبي الأكاديمي #067FC7 · العاجي #F7FAFF · النص #25332E
-   تنبيه تباين: الذهبي للزخرفة والأزرار (نص داكن عليه) فقط؛ لا تستعمله نصًا على الخلفية الفاتحة (استعمل --gold-ink). */
+   V8: أزرق مؤسسي عميق وكهربائي · أصفر كريمي دافئ · أسود للوضع الداكن.
+   الذهبي/الكريمي زخرفة وأزرار (نص داكن عليه). للنص التمييزي على الخلفية الفاتحة استعمل --gold-ink (أزرق). */
 :root {
-  --primary: #054494; --primary-ink: #083A78; --primary-hover: #0A56B8; --on-primary: #FFFFFF;
-  --secondary: #1B6FC4;
-  --accent: #5EB2F3; --accent-hover: #5AAEF2; --on-accent: #06264F; --gold-ink: #054494;
-  --bg: #F5F8FC; --surface: #FFFFFF; --tint: #E8F0FA; --text: #16263A; --muted: #4F6178; --line: #D5E1EF;
-  --success: #1E7A4F; --danger: #B3261E; --warning: #8A5A00; --info: #054494;
-  --hero-bg: #0A2F66;
+  --primary: #0A3AC0; --primary-ink: #072A8E; --primary-hover: #1F5BFF; --on-primary: #FFFFFF;
+  --secondary: #1E50D6;
+  --accent: #F2D585; --accent-hover: #F7E2A4; --on-accent: #0E1B3D; --gold-ink: #0A3AC0;
+  --bg: #FBF4E1; --surface: #FFFBF0; --tint: #F4EACB; --text: #0F1B36; --muted: #4B5673; --line: #E5D8AE;
+  --success: #1E7A4F; --danger: #B3261E; --warning: #8A5A00; --info: #0A3AC0;
+  --hero-bg: #060B1E;
   /* مقياس المسافات (px): 4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 */
   --sp-4: 4px; --sp-8: 8px; --sp-12: 12px; --sp-16: 16px; --sp-24: 24px; --sp-32: 32px; --sp-48: 48px; --sp-64: 64px;
   /* أنصاف الأقطار: 8 صغير (حقول/أشرطة) · 12 أيقونات · 16 بطاقات · 24 لوحات · كبسولة */
@@ -23,32 +22,34 @@
   /* الحركة */
   --t-fast: 120ms; --t-base: 220ms; --t-slow: 500ms; --ease: cubic-bezier(.2, .7, .2, 1);
   /* ألوان الهوية الثابتة (لا تتغير بين الوضعين) */
-  --brand-blue: #054494; --brand-sky: #4EA1EE; --brand-white: #F7FAFF;
-  --footer-bg: #0A2447; --footer-fg: #D5E3F5; --footer-line: #1B3860;
-  --focus: #067FC7;
-  /* ظلال متدرجة مشتقة من الأخضر المؤسسي */
-  --sh-1: 0 1px 2px rgba(5, 68, 148, .10);
-  --sh-2: 0 1px 2px rgba(5, 68, 148, .06), 0 6px 16px rgba(5, 68, 148, .09);
-  --sh-3: 0 2px 4px rgba(5, 68, 148, .06), 0 14px 32px rgba(5, 68, 148, .16);
+  --brand-blue: #0A3AC0; --brand-electric: #1F5BFF; --brand-sky: #6F98FF; --brand-cream: #FBF4E1; --brand-white: #FBF4E1;
+  --footer-bg: #060B1E; --footer-fg: #E9E2CC; --footer-line: #1B2646;
+  --focus: #1F5BFF;
+  /* ظلال متدرجة مشتقة من الأزرق المؤسسي */
+  --sh-1: 0 1px 2px rgba(10, 58, 192, .10);
+  --sh-2: 0 1px 2px rgba(10, 58, 192, .06), 0 6px 16px rgba(60, 45, 0, .08);
+  --sh-3: 0 2px 4px rgba(10, 58, 192, .06), 0 14px 32px rgba(60, 45, 0, .14);
   --shadow: var(--sh-2);
   /* بلاطات الأيقونات (عمق خفيف) */
-  --tile-from: #0A56B8; --tile-to: #054494; --tile-fg: #FFFFFF;
+  --tile-from: #1F5BFF; --tile-to: #0A3AC0; --tile-fg: #FFFFFF;
   --font-body: "Noto Sans Arabic", "Segoe UI", Tahoma, "Arial", sans-serif;
   --font-head: "IBM Plex Sans Arabic", "Noto Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  --font-display: "IBM Plex Sans Arabic", "Noto Sans Arabic", "Segoe UI", Tahoma, sans-serif;
   --star: none; --star-gold: none;
   color-scheme: light;
 }
+:root[lang="fr"] { --font-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", Georgia, serif; --font-head: "Fraunces", "Iowan Old Style", "Palatino Linotype", Georgia, serif; --font-body: "Noto Sans Arabic", "Segoe UI", system-ui, "Helvetica Neue", Arial, sans-serif; }
 :root[data-theme="dark"] {
-  --primary: #8DB8F0; --primary-ink: #A9CBF6; --primary-hover: #A6C8F4; --on-primary: #0C1624;
-  --secondary: #6FA3E0;
-  --accent: #5AA9F2; --accent-hover: #7BBBF6; --on-accent: #06264F; --gold-ink: #8DB8F0;
-  --bg: #0C1624; --surface: #132238; --tint: #0F1B2E; --text: #E6EEF8; --muted: #9DB1C9; --line: #25364F;
-  --success: #5CC38D; --danger: #FF8A80; --warning: #E8B04B; --info: #7FB8E0;
-  --hero-bg: #081B3A;
+  --primary: #7FA4FF; --primary-ink: #A9C0FF; --primary-hover: #9DBAFF; --on-primary: #05070C;
+  --secondary: #7FA4FF;
+  --accent: #2B63F2; --accent-hover: #4F82FF; --on-accent: #FFFFFF; --gold-ink: #F2D585;
+  --bg: #05070C; --surface: #0C1220; --tint: #080D18; --text: #F3EDDC; --muted: #A3AEC4; --line: #1C2740;
+  --success: #5CC38D; --danger: #FF8A80; --warning: #E8B04B; --info: #7FA4FF;
+  --hero-bg: #04060D;
   --sh-1: 0 1px 2px rgba(0, 0, 0, .5);
   --sh-2: 0 1px 2px rgba(0, 0, 0, .4), 0 6px 16px rgba(0, 0, 0, .35);
   --sh-3: 0 2px 4px rgba(0, 0, 0, .4), 0 14px 32px rgba(0, 0, 0, .5);
-  --tile-from: #1F5AA6; --tile-to: #154A8C;
+  --tile-from: #2F6BFF; --tile-to: #1B45C8;
   color-scheme: dark;
 }
 
@@ -97,26 +98,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .tools { display: flex; gap: var(--sp-8); }
 .nav { display: none; }
 
-/* Hero: ملء الشاشة الأولى. سطح المكتب: المبنى يمينًا (الصورة الحقيقية) والنص يسارًا في نطاق مخصص.
    الهاتف: تركيبة مستقلة (ليست تصغيرًا للحاسوب) — الصورة مقصوصة لإبراز المبنى، والنص في شريط سفلي واضح. */
-.hero { position: relative; min-height: 100svh; min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; color: var(--brand-white); isolation: isolate; background: var(--hero-bg); overflow: hidden; }
-.hero__media { position: absolute; inset: 0; z-index: -2; }
-.hero__media picture, .hero__media img { display: block; width: 100%; height: 100%; object-fit: cover; }
-/* الهاتف: قص يُبرز العلم والسلالم والمدخل (يمين الصورة الأصلية) */
-.hero__media img { object-position: 78% 38%; }
-.hero__scrim { position: absolute; inset: 0; z-index: -1; background:
-    linear-gradient(to top, rgba(8, 27, 58, .92) 0%, rgba(8, 27, 58, .78) 38%, rgba(8, 27, 58, .22) 68%, rgba(8, 27, 58, .05) 100%); }
-.hero__in { position: relative; width: 100%; padding: var(--sp-24) var(--gutter) clamp(4.5rem, 14vh, 6rem); }
-.hero__kicker { margin: 0 0 var(--sp-8); color: var(--accent); font-weight: 600; font-size: var(--fs-sm); letter-spacing: .01em; }
-.hero h1 { font-size: clamp(1.9rem, 8vw, 2.75rem); line-height: var(--lh-tight); margin-bottom: var(--sp-12); text-wrap: balance; }
-.hero__tag { font-size: clamp(1rem, 3.4vw, 1.15rem); line-height: var(--lh-snug); max-width: 36ch; opacity: .96; margin-bottom: 0; }
-.hero__cta { display: flex; flex-wrap: wrap; gap: var(--sp-12); margin-top: var(--sp-24); }
-.hero__in > * { opacity: 0; transform: translateY(16px); animation: rise var(--t-slow) var(--ease) forwards; }
-.hero__in > :nth-child(2) { animation-delay: .08s; } .hero__in > :nth-child(3) { animation-delay: .16s; } .hero__in > :nth-child(4) { animation-delay: .24s; }
-@keyframes rise { to { opacity: 1; transform: none; } }
-.hero__scroll { position: absolute; inset-inline-start: 50%; bottom: var(--sp-16); transform: translateX(-50%); width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: var(--brand-white); background: rgba(247, 250, 255, .14); border: 1px solid rgba(247, 250, 255, .3); backdrop-filter: blur(4px); animation: bob 2.4s ease-in-out infinite; text-decoration: none; }
-@keyframes bob { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
-@supports (height: 100dvh) { .hero { min-height: 100dvh; } }
 
 /* الخدمات المدرسية */
 .svc { display: grid; gap: var(--sp-12); grid-template-columns: 1fr; }
@@ -130,7 +112,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 
 /* إحصائيات (تظهر فقط عند وجود أرقام موثقة) */
 .stats { background: var(--primary-ink); color: var(--on-primary); padding-block: var(--sp-32); }
-:root[data-theme="dark"] .stats { background: #0F2440; color: var(--text); }
+:root[data-theme="dark"] .stats { background: #0A1330; color: var(--text); }
 .stats__grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-16); text-align: center; }
 .stat b { display: block; font: 700 clamp(1.9rem, 7vw, 2.8rem) var(--font-head); color: var(--accent); } .stat span { opacity: .9; font-size: var(--fs-sm); }
 
@@ -147,7 +129,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 
 /* اليوم في الرازي */
 .today { background: var(--primary-ink) var(--star); color: #fff; }
-:root[data-theme="dark"] .today { background: #0F2440 var(--star); color: var(--text); }
+:root[data-theme="dark"] .today { background: #0A1330 var(--star); color: var(--text); }
 .today .head h2 { color: inherit; } .today .demo { color: rgba(255, 255, 255, .7); }
 .today__grid { display: grid; gap: var(--sp-8); }
 .tc { display: grid; grid-template-columns: auto 1fr; column-gap: var(--sp-12); align-items: center; padding: var(--sp-12) var(--sp-16); border-radius: var(--r-lg); background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .16); text-decoration: none; transition: background var(--t-base) var(--ease); min-height: 64px; }
@@ -259,11 +241,6 @@ input[type="search"], select { width: 100%; min-height: 48px; padding: var(--sp-
   .masonry { columns: 3; column-gap: var(--sp-12); } .mi { margin-bottom: var(--sp-12); }
 }
 @media (min-width: 900px) {
-  /* سطح المكتب: النص في نطاق ثابت على اليسار الفعلي (margin-right:auto فيزيائي يتجاوز RTL هنا عمدًا)، والمبنى يبقى واضحًا على اليمين */
-  .hero__in { max-width: 30rem; margin-inline: 0; margin-left: 0; margin-right: auto; padding: 0 clamp(var(--sp-32), 6vw, 5.5rem) clamp(5.5rem, 12vh, 7rem); }
-  /* يبقى التدرّج والنص على اليسار الفعلي دومًا (حتى في الوضع الفرنسي LTR) بحسب اشتراط العميل الصريح */
-  .hero__scrim { background: linear-gradient(to right, rgba(8, 27, 58, .86) 0%, rgba(8, 27, 58, .62) 34%, rgba(8, 27, 58, .18) 58%, transparent 74%); }
-  .hero__media img { object-position: 62% 42%; }
   .topnews { grid-template-columns: 1.55fr 1fr; align-items: stretch; }
   .nm__b h3 { font-size: var(--fs-h3); }
   .split { grid-template-columns: 1.1fr 1fr; gap: var(--sp-48); }
@@ -290,7 +267,7 @@ input[type="search"], select { width: 100%; min-height: 48px; padding: var(--sp-
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
-  .rv, .hero__in > * { opacity: 1; transform: none; }
+  .rv { opacity: 1; transform: none; }
 }
 
 /* قراءة الخبر + أخطاء */
@@ -325,7 +302,7 @@ input[type="search"], select { width: 100%; min-height: 48px; padding: var(--sp-
 .btn svg { flex: none; }
 .btn--sm { min-height: var(--h-control-sm); padding: 0 var(--sp-16); font-size: var(--fs-sm); }
 .btn--accent { --b-bg: var(--accent); --b-fg: var(--on-accent); --b-bg-h: var(--accent-hover); }
-.btn--ghost { --b-bg: transparent; --b-fg: var(--brand-white); --b-bd: rgba(247, 245, 239, .7); --b-bg-h: rgba(247, 245, 239, .14); box-shadow: none; }
+.btn--ghost { --b-bg: transparent; --b-fg: var(--text); --b-bd: var(--line); --b-bg-h: var(--tint); box-shadow: none; }
 .btn--outline { --b-bg: transparent; --b-fg: var(--text); --b-bd: var(--line); --b-bg-h: var(--tint); box-shadow: none; }
 .btn--outline:hover { border-color: var(--accent); }
 .btn--danger { --b-bg: var(--danger); --b-fg: #fff; --b-bg-h: #9C201A; }
@@ -387,8 +364,7 @@ a.sv:hover .sv__arr { transform: translateX(-3px); } [dir="ltr"] a.sv:hover .sv_
 @media (min-width: 900px) { :root { --grid-gap: 24px; } }
 @media (min-width: 1100px) { :root { --gutter: 32px; } }
 .card--ico, .an, .sv { padding: var(--card-pad); } .tcard { padding: var(--card-pad); }
-.head { margin-bottom: var(--sp-24); } .hero__cta { margin-top: var(--sp-24); }
-.hero h1 { margin-bottom: var(--sp-16); } .hero__tag { margin-bottom: 0; }
+.head { margin-bottom: var(--sp-24); }
 
 @media (prefers-reduced-motion: reduce) {
   .btn.is-loading::after, .btn-icon.is-loading::after { animation: spin 1.6s linear infinite !important; }
@@ -398,8 +374,6 @@ a.sv:hover .sv__arr { transform: translateX(-3px); } [dir="ltr"] a.sv:hover .sv_
 .footer__nav a { display: inline-flex; align-items: center; min-height: var(--h-control-sm); }
 .sheet a { min-height: 52px; }
 
-/* أزرار الـ Hero على الهواتف الضيقة: تبقى في صف واحد كما في التصميم السابق */
-@media (max-width: 479px) { .hero__cta .btn { padding: 0 var(--sp-16); flex: 1 1 auto; } }
 
 /* ===== استعمال الزمن: شبكة + طباعة ===== */
 .ttg-wrap { overflow-x: auto; margin-top: var(--sp-16); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); }

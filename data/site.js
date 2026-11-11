@@ -4,7 +4,7 @@ window.RAZI = window.RAZI || {};
 const D = n => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10);
 
 RAZI.site = {
-  nameAr: "الثانوية التأهيلية الرازي", nameFr: "Lycée Qualifiant Al-Razi",
+  nameAr: "الثانوية التأهيلية الرازي", nameFr: "Lycée Qualifiant Al-Razi",   /* الاسم الرسمي بالعربية + الفرنسية (يُستعملان في الـ Hero) */
   city: "تارجيست", province: "إقليم الحسيمة", country: "المغرب",
   mapsLink: "https://maps.app.goo.gl/ifFLYfBmavofSJ8B9",
   mapsEmbed: null,   // TODO: src من Google Maps → مشاركة → تضمين خريطة
@@ -34,7 +34,8 @@ RAZI.nav = [
   { id: "schedule", ar: "استعمال الزمن", fr: "Emploi du temps", icon: "clock" },
   { id: "teachers", ar: "الأساتذة", fr: "Enseignants", icon: "users" },
   { id: "gallery", ar: "المعرض", fr: "Galerie", icon: "image" },
-  { id: "contact", ar: "التواصل", fr: "Contact", icon: "pin" }
+  { id: "contact", ar: "التواصل", fr: "Contact", icon: "pin" },
+  { id: "assistant", href: "assistant.html", ar: "دليل الرازي", fr: "Guide Al-Razi", icon: "spark", ai: true }
 ];
 /* عناصر شريط الهاتف السفلي (الباقي في "المزيد") */
 RAZI.bottomNav = ["top", "news", "resources", "schedule"];

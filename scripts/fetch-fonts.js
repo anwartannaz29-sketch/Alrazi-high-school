@@ -2,7 +2,7 @@
 // يتطلب اتصالًا بالإنترنت وNode 18+. بعدها يُخدَّم كل شيء من نطاقك دون طلبات خارجية. تحقق من ترخيص الخطوط (SIL OFL) قبل النشر.
 const fs = require("fs"), path = require("path");
 const OUT = path.join(__dirname, "..", "assets", "fonts"); fs.mkdirSync(OUT, { recursive: true });
-const CSS = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@600;700&family=Noto+Sans+Arabic:wght@400;600&display=swap";
+const CSS = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@600;700&family=Noto+Sans+Arabic:wght@400;600&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap";
 (async () => {
   const css = await (await fetch(CSS, { headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36" } })).text();
   const blocks = [...css.matchAll(/\/\*\s*([\w-]+)\s*\*\/\s*@font-face\s*{([^}]*)}/g)]; let n = 0;
@@ -12,5 +12,5 @@ const CSS = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@
     const name = `${fam.toLowerCase().replace(/\s+/g, "-")}-${w}-${subset}.woff2`;
     fs.writeFileSync(path.join(OUT, name), Buffer.from(await (await fetch(url)).arrayBuffer())); console.log("✔", name); n++;
   }
-  if (n !== 8) { console.error(`⚠️ تم تنزيل ${n} ملفات من 8 المتوقعة. راجع الشبكة وأعد المحاولة.`); process.exit(1); }
+  if (n !== 10) { console.error(`⚠️ تم تنزيل ${n} ملفات من 10 المتوقعة. راجع الشبكة وأعد المحاولة.`); process.exit(1); }
 })().catch(e => { console.error("❌ فشل تنزيل الخطوط:", e.message); process.exit(1); });

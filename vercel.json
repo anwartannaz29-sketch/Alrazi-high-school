@@ -7,6 +7,11 @@
       "source": "/:dir(supabase|tests|scripts|docs)/:path*",
       "destination": "/",
       "permanent": false
+    },
+    {
+      "source": "/api/_lib/:path*",
+      "destination": "/",
+      "permanent": false
     }
   ],
   "headers": [
@@ -47,6 +52,20 @@
           "value": "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
         }
       ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
     }
-  ]
+  ],
+  "functions": {
+    "api/assistant.js": {
+      "maxDuration": 10
+    }
+  }
 }
