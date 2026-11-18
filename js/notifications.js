@@ -79,14 +79,18 @@
   }
   const api = (method, data) => fetch("/api/push-subscription", { method, headers: data ? { "Content-Type": "application/json" } : undefined, body: data ? JSON.stringify(data) : undefined, credentials: "omit", cache: "no-store" }).then(async r => ({ ok: r.ok, status: r.status, j: await r.json().catch(() => null) }));
   const subBody = (sub, action) => { const j = sub.toJSON(); return { action, endpoint: sub.endpoint, keys: j.keys, lang: lang() }; };
+  let why = "";   // سبب الفشل التقني (يُعرض صغيرًا للتشخيص؛ لا يحوي بيانات شخصية)
   async function enablePush() {
-    if (!supported()) return "unsupported";
-    const k = await api("GET"); if (!k.ok || !k.j || !k.j.publicKey) return "unavailable";
+    why = ""; if (!supported()) return "unsupported";
+    const k = await api("GET"); if (!k.ok || !k.j || !k.j.publicKey) { why = "config " + k.status + " " + ((k.j && k.j.code) || ""); return "unavailable"; }
     const perm = await Notification.requestPermission();                       // بعد نقرة الزائر فقط
     if (perm !== "granted") return perm === "denied" ? "denied" : "idle";
-    const reg = await navigator.serviceWorker.register("/service-worker.js"); await navigator.serviceWorker.ready;
-    let sub = await reg.pushManager.getSubscription(); if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToU8(k.j.publicKey) });
-    const r = await api("POST", subBody(sub, "subscribe")); if (!r.ok) { try { await sub.unsubscribe(); } catch (e) {} return "fail"; }
+    let reg, sub;
+    try { reg = await navigator.serviceWorker.register("/service-worker.js"); await navigator.serviceWorker.ready; } catch (e) { why = "service-worker: " + ((e && e.name) || "error"); return "fail"; }
+    try { sub = await reg.pushManager.getSubscription(); if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToU8(k.j.publicKey) }); }
+    catch (e) { why = "browser-push: " + ((e && e.name) || "error") + " " + String((e && e.message) || "").slice(0, 80); return "fail"; }
+    let r; try { r = await api("POST", subBody(sub, "subscribe")); } catch (e) { why = "network"; return "fail"; }
+    if (!r.ok) { why = "server " + r.status + " " + ((r.j && r.j.code) || ""); try { await sub.unsubscribe(); } catch (e) {} return "fail"; }
     return "active";
   }
   async function disablePush() {
@@ -104,7 +108,7 @@
     const box = el("div", "nt-push"), msg = el("p", "nt-push__msg"), btn = el("button", "nt-btn nt-btn--primary"); btn.type = "button"; btn.dataset.push = "1"; msg.setAttribute("role", "status");
     const paint = async st => { const t = tx().push; box.dataset.state = st; btn.hidden = st === "unsupported" || st === "denied" || st === "unavailable";
       btn.textContent = st === "active" ? t.off : t.on; btn.disabled = false; btn.removeAttribute("aria-busy");
-      msg.textContent = ({ active: t.active, denied: t.denied, unsupported: t.unsupported, unavailable: t.unavailable, fail: t.fail, idle: t.hint })[st] || t.hint; };
+      msg.textContent = ({ active: t.active, denied: t.denied, unsupported: t.unsupported, unavailable: t.unavailable + (why ? " (" + why + ")" : ""), fail: t.fail + (why ? " (" + why + ")" : ""), idle: t.hint })[st] || t.hint; };
     btn.addEventListener("click", async () => { btn.disabled = true; btn.setAttribute("aria-busy", "true"); let st; try { st = box.dataset.state === "active" ? await disablePush() : await enablePush(); } catch (e) { st = "fail"; } await paint(st); });
     box.append(msg, btn); pushState().then(paint); box._paint = paint; return box;
   }
