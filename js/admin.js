@@ -12,7 +12,7 @@
   const TYPES = ["إداري", "موعد", "وثيقة", "تغيير", "تنبيه"];
   const KINDS = {
     news: { title: "الأخبار", one: "خبر", sel: "id,title,slug,excerpt,content,image_url,category,featured,status,published_at,created_at,updated_at" },
-    announcements: { title: "الإعلانات", one: "إعلان", sel: "id,title,content,type,pinned,status,start_at,end_at,created_at,updated_at" }
+    announcements: { title: "الإعلانات", one: "إعلان", sel: "*" }
   };
   let tab = "dash", editing = null, rows = [], hasMore = false;
   const PAGE = 50, DRAFT = "razi_draft_";
@@ -136,6 +136,7 @@
       <label class="f">النص<textarea id="f_content" rows="5" maxlength="5000">${esc(d.content)}</textarea></label>
       ${sel("f_type", TYPES.map(x => [x, x]), d.type || "إداري", "النوع")}
       <label class="f f--chk"><input id="f_pinned" type="checkbox" ${d.pinned ? "checked" : ""}> تثبيت الإعلان</label>
+      <label class="f f--chk"><input id="f_notify" type="checkbox" ${d.notify === false ? "" : "checked"}> إنشاء إشعار للزوار عند النشر (مرة واحدة فقط)</label>
       <label class="f">بداية العرض<input id="f_start" type="datetime-local" value="${toLocal(d.start_at)}"></label>
       <label class="f">نهاية العرض (اختياري)<input id="f_end" type="datetime-local" value="${toLocal(d.end_at)}"></label>`) + sel("f_status", stOpts, d.status || "draft", "الحالة");
     $("#formDlg").dataset.kind = kind; draftKey = DRAFT + kind + "_" + (r ? r.id : "new");
@@ -161,6 +162,7 @@
     } else {
       const s = v("f_start"), e = v("f_end"); if (s && e && new Date(e) <= new Date(s)) return fail("نهاية العرض يجب أن تكون بعد البداية.");
       body = { title: v("f_title"), content: v("f_content"), type: v("f_type"), pinned: c("f_pinned"), status, start_at: s ? new Date(s).toISOString() : null, end_at: e ? new Date(e).toISOString() : null };
+      { const nf = c("f_notify"); if (editing ? (editing.notify !== false) !== nf : !nf) body.notify = nf; }   // لا يُرسَل العمود إلا عند تغييره (متوافق قبل الترحيل 003)
     }
     const b = $("#saveBtn"); busy(b, true);
     try {

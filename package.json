@@ -12,11 +12,16 @@
     "fonts": "node scripts/fetch-fonts.js",
     "test:design": "python tests/design-lint.py && python tests/contrast.py",
     "test:cms": "python tests/e2e_cms.py",
-    "test:all": "npm run test:build && npm run test:ai && npm run test:ai-ui && npm run test:design && npm run test:e2e && npm run test:cms",
+    "test:all": "npm run test:build && npm run test:ai && npm run test:ai-ui && npm run test:push && npm run test:ui && npm run test:design && npm run test:e2e && npm run test:cms",
     "test:ai": "node tests/assistant.test.js",
-    "test:ai-ui": "python tests/assistant-ui.py"
+    "test:ai-ui": "python tests/assistant-ui.py",
+    "test:push": "node tests/push.test.js",
+    "test:ui": "python tests/notifications-ui.py"
   },
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "web-push": "^3.6.7"
   }
 }

@@ -86,3 +86,8 @@ fieldset.f { border: 1px solid var(--line); border-radius: var(--r-md); padding:
 
 input[type="time"], input[type="date"] { min-height: var(--h-control-sm); }
 .f--chk input[type="checkbox"] { width: 22px; height: 22px; }
+
+/* معاينة الإشعار (admin-notify.js) */
+.ntp-wrap { display: grid; gap: var(--sp-8); margin-top: var(--sp-12); } .ntp-wrap > div { display: grid; gap: var(--sp-8); }
+@media (min-width: 640px) { .ntp-wrap > div { grid-template-columns: 1fr 1fr; } }
+.ntp { display: grid; gap: var(--sp-8); padding: var(--sp-12); border: 1px solid var(--line); border-radius: var(--r-md); background: var(--tint); } .ntp small { color: var(--muted); } .ntp span { color: var(--muted); font-size: var(--fs-sm); overflow-wrap: anywhere; }

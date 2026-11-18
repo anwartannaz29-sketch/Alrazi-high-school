@@ -55,7 +55,7 @@ function cfgFrom(env) {
 }
 async function rest(cfg, fetchFn, table, query) {
   const r = await fetchFn(`${cfg.url}/rest/v1/${table}?${query}`, {
-    method: "GET", headers: { apikey: cfg.key, Authorization: "Bearer " + cfg.key, Accept: "application/json" }, signal: AbortSignal.timeout(TIMEOUT_MS)
+    method: "GET", headers: Object.assign({ apikey: cfg.key, Accept: "application/json" }, cfg.key.split(".").length === 3 ? { Authorization: "Bearer " + cfg.key } : {}), signal: AbortSignal.timeout(TIMEOUT_MS)
   });
   if (!r.ok) throw new Error("supabase_" + r.status);
   const j = await r.json(); return Array.isArray(j) ? j : [];

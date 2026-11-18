@@ -90,3 +90,6 @@ git push origin v3-admin     # Vercel ينشئ رابط Preview للتجربة
 ### الاختبارات المضافة
 - `python tests/e2e_cms.py` — تدفق استعمال الزمن والأقسام الجديدة على Supabase وهمي (40 فحصًا: إنشاء/نشر/حذف جدول، تعارضات الأستاذ والقاعة، رفع ملفات آمن بفحص التوقيع الفعلي للملف لا امتداده فقط، تعقيم XSS، صلاحيات غير المسؤول).
 - لا تثبت هذه الاختبارات سلامة RLS الحقيقية؛ وسّع `tests/supabase.integration.mjs` بنفس أسلوب §5-ب لتغطية الجداول الجديدة قبل الإطلاق الرسمي لهذه الأقسام.
+
+## 11) إدارة الإشعارات (الترحيل 003)
+بعد 001 و002: نفّذ `supabase/migrations/003_notifications.sql` ثم `supabase/tests/rls_checks_notifications.sql` في SQL Editor. أضف في Vercel: `VAPID_PUBLIC_KEY` و`VAPID_PRIVATE_KEY` و`VAPID_SUBJECT` (مفاتيح من `npx web-push generate-vapid-keys`) ثم `npm install` وأعد النشر. في لوحة الإدارة ← «إدارة الإشعارات». الإرسال لا يتم إلا بطلب صريح ومرة واحدة لكل إشعار. التفاصيل والتراجع: `docs/NOTIFICATIONS.md`.

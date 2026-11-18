@@ -42,3 +42,6 @@ V2 تصميم+Mobile+بنية المحتوى ← V3 الأخبار/الإعلا�
 
 ## مساعد «دليل الرازي» — طبقة Gemini (V8+)
 `js/assistant.js` يستدعي `POST /api/assistant` (دالة Vercel في `api/`) عند الإعداد الحي؛ تسترجع الدالة المحتوى **المنشور فقط** من Supabase بمفتاح anon ثم تسأل Gemini من الخادم. المفتاح `GEMINI_API_KEY` لا يصل للمتصفح. تبقى `answer()` المحلية احتياطًا عند تعذّر الخدمة. التفاصيل والإعداد: `docs/GEMINI_ASSISTANT.md`.
+
+## مركز الإشعارات + كشف التمرير (V8+)
+`js/notifications.js` (جرس + لوحة + `notifications.html` لكل زائر)، `service-worker.js` + `manifest.webmanifest` (Push الاختياري)، `api/push-subscription.js` و`api/push-send.js` (دوال Vercel بلا service-role)، `supabase/migrations/003_notifications.sql`، قسم «إدارة الإشعارات» في `js/admin-notify.js`، و`js/reveal.js`. التفاصيل: `docs/NOTIFICATIONS.md`. أزيل مؤشر التمرير `.hero__scroll` نهائيًا.

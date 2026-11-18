@@ -61,11 +61,34 @@
           "value": "no-store"
         }
       ]
+    },
+    {
+      "source": "/service-worker.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        },
+        {
+          "key": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
+        }
+      ]
     }
   ],
   "functions": {
     "api/assistant.js": {
       "maxDuration": 10
+    },
+    "api/push-subscription.js": {
+      "maxDuration": 10
+    },
+    "api/push-send.js": {
+      "maxDuration": 30
     }
   }
 }

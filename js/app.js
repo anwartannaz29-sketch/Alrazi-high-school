@@ -346,7 +346,8 @@
     const rm = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .12 });
     document.querySelector('[data-sec="top"]')?.classList.add("act");
-    document.querySelectorAll(".section .wrap > *, .quick").forEach(el => { if (rm) el.classList.add("in"); else { el.classList.add("rv"); io.observe(el); } });
+    /* نظام الكشف الموحّد في js/reveal.js؛ هذا المسار القديم (.rv) يبقى احتياطًا فقط إن لم يُحمَّل reveal.js */
+    if (!window.RAZI_REVEAL) document.querySelectorAll(".section .wrap > *, .quick").forEach(el => { if (rm) el.classList.add("in"); else { el.classList.add("rv"); io.observe(el); } });
     const spy = new IntersectionObserver(es => es.forEach(e => {
       if (!e.isIntersecting) return; const id = e.target.id;
       document.querySelectorAll("[data-sec]").forEach(a => a.classList.toggle("act", a.dataset.sec === id));

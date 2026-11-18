@@ -23,7 +23,7 @@ RAZI.fr = {
   "تارجيست، إقليم الحسيمة، المغرب": "Targuist, province d'Al Hoceïma, Maroc",
   "تعلّم.": "Apprendre.", "اكتشف.": "Découvrir.", "ابنِ مستقبلك.": "Construire l'avenir.",
   "مؤسسة تعليمية عمومية في تارجيست، تحتضن أبناء المنطقة وتواكب مسارهم الدراسي.": "Établissement public à Targuist, au service des élèves de la région et de leur parcours scolaire.",
-  "اكتشف مؤسستنا": "Découvrir l'établissement", "اتصل بنا": "Nous contacter", "مرر للأسفل": "Défiler", "التمرير للأسفل": "Défiler vers le bas",
+  "اكتشف مؤسستنا": "Découvrir l'établissement", "اتصل بنا": "Nous contacter",
   "مقدمة": "Introduction", "شعار الثانوية التأهيلية الرازي بتقديم ثلاثي الأبعاد": "Logo du lycée Al-Razi en présentation 3D",
   /* أقسام */
   "أهم الأخبار": "À la une", "آخر المستجدات": "Dernières actualités", "الإعلانات": "Annonces", "المعرض": "Galerie", "تصنيف الصور": "Catégories de photos",
