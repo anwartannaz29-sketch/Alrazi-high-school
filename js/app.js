@@ -22,6 +22,9 @@
     gallery: { q: "gallery_items?select=id,title,category,image_url&status=eq.published&order=created_at.desc&limit=120", map: r => ({ id: r.id, category: r.category, image: safeUrl(r.image_url), caption: esc(r.title || "صورة من المؤسسة"), live: true }) },
     clubs: { q: "clubs?select=id,name,description,icon&status=eq.published&order=sort_order.asc,name.asc&limit=100", map: r => ({ id: r.id, name: esc(r.name), icon: ["book", "ball", "leaf", "palette", "flask", "users", "trophy", "star"].includes(r.icon) ? r.icon : "users", text: esc(r.description || "") }) },
     activities: { q: "activities?select=id,kind,title,description&status=eq.published&order=sort_order.asc,created_at.desc&limit=100", map: r => ({ id: r.id, kind: r.kind, title: esc(r.title), icon: { "ثقافية": "book", "رياضية": "ball", "علمية": "flask", "بيئية": "leaf", "فنية": "palette", "مسابقات": "trophy" }[r.kind] || "star", text: esc(r.description || "") }) },
+    stats: { q: "school_statistics?select=id,kind,label,label_fr,value,as_of&status=eq.published&order=sort_order.asc,created_at.asc&limit=12", map: r => ({ id: r.id, label: r.label, labelFr: r.label_fr || "", value: Number(r.value), asOf: r.as_of }) },
+    classes: { q: "school_classes?select=id,level,level_fr,track,track_fr,name,name_fr,code,description,description_fr,students_count&status=eq.published&order=sort_order.asc,name.asc&limit=300", map: r => r },
+    staff: { q: "staff_profiles?select=id,full_name,job_title,job_title_fr,specialty,specialty_fr,department,department_fr,bio,bio_fr,photo_path,sort_order,staff_categories(id,name,name_fr,sort_order)&status=eq.published&order=sort_order.asc,full_name.asc&limit=100", map: r => r },
     achievements: { q: "achievements?select=id,kind,title,description,achieved_on&status=eq.published&order=achieved_on.desc.nullslast,created_at.desc&limit=100", map: r => ({ id: r.id, kind: r.kind, title: esc(r.title), text: esc(r.description || ""), date: r.achieved_on }) }
   };
   const api = {
@@ -158,16 +161,76 @@
       ? `<a class="sv" href="${href}"><span class="sv__i">${ico(i, 24)}</span><h3>${X(ti)}</h3><span class="sv__arr"><span class="flip">${ico("arrow", 20)}</span></span><p>${X(d)}</p></a>`
       : `<div class="sv sv--off" aria-disabled="true"><span class="sv__i">${ico(i, 24)}</span><h3>${X(ti)}</h3><span class="tag">${X("قريبًا")}</span><p>${X(d)}</p></div>`}</div>`).join("");
   }
-  /* ---------- إحصائيات: فقط الأرقام الموثقة (confirmed:true) ---------- */
-  function renderStats() {
-    const st = (R.stats || []).filter(x => x.confirmed === true && Number(x.value) > 0 && x.label);
+  /* ---------- المؤسسة بالأرقام: أرقام رسمية منشورة من Supabase فقط (لا أرقام ثابتة، ولا قيم غير مؤكدة) ---------- */
+  const L = (ar, fr) => (lang === "fr" && fr ? fr : ar);
+  let statsCache = null;
+  async function renderStats() {
+    let st;
+    if (live) { if (!statsCache || !statsCache.length) statsCache = await api.list("stats"); st = statsCache.filter(x => Number.isFinite(x.value) && x.value >= 0 && x.label); }
+    else st = (R.stats || []).filter(x => x.confirmed === true && Number(x.value) > 0 && x.label).map(x => ({ label: x.label, labelFr: "", value: Number(x.value), asOf: null }));
     $("#stats").hidden = !st.length; if (!st.length) return;
-    $("#statsGrid").innerHTML = st.map(x => `<div class="stat"><b data-to="${Number(x.value)}">0</b><span>${esc(x.label)}</span></div>`).join("");
+    $("#statsGrid").innerHTML = st.map(x => `<div class="stat"><b data-to="${Number(x.value)}">0</b><span>${esc(L(x.label, x.labelFr))}</span></div>`).join("");
+    const last = st.map(x => x.asOf).filter(Boolean).sort().pop(), ao = $("#statsAsOf"); if (ao) { ao.hidden = !last; if (last) ao.textContent = `${X("آخر تحديث")}: ${fmt(last)}`; }
     const rm = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; io.unobserve(e.target); e.target.querySelectorAll("[data-to]").forEach(el => {
       const to = +el.dataset.to, t0 = performance.now(); if (rm) { el.textContent = to; return; }
       const tick = n => { const p = Math.min((n - t0) / 1200, 1); el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); }); }), { threshold: .3 });
     io.observe($("#statsGrid"));
+  }
+
+  /* ---------- الأقسام والمسالك (مصنّفة حسب المستوى) ---------- */
+  async function renderClasses() {
+    const all = await api.list("classes"), sec = $("#classes"); if (!sec) return;
+    sec.hidden = !all.length; if (!all.length) return;
+    const by = new Map(); all.forEach(c => { const k = c.level; if (!by.has(k)) by.set(k, []); by.get(k).push(c); });
+    $("#clsCount").textContent = `${X("عدد الأقسام المنشورة")}: ${all.length}`;
+    const stu = n => (n == null ? "" : `<span class="cls__n">${n} ${X("تلميذ")}</span>`);
+    $("#clsList").innerHTML = [...by.values()].map(g => `<div class="lvl"><h3>${esc(L(g[0].level, g[0].level_fr))} <small>(${g.length})</small></h3><ul class="cls">${g.map(c => {
+      const head = `<b>${esc(L(c.name, c.name_fr))}</b>${c.track ? `<span class="cls__t">${esc(L(c.track, c.track_fr))}</span>` : ""}${c.code ? `<span class="cls__c" dir="ltr">${esc(c.code)}</span>` : ""}${stu(c.students_count)}`, d = L(c.description, c.description_fr);
+      return d ? `<li><details><summary>${head}</summary><p>${esc(d)}</p></details></li>` : `<li><div class="cls__r">${head}</div></li>`; }).join("")}</ul></div>`).join("");
+  }
+
+  /* ---------- ملفات الأطر: صور من حاوية خاصة بروابط موقّعة قصيرة العمر ---------- */
+  async function signPhotos(paths) {
+    const out = {}; if (!paths.length || !live) return out;
+    try {
+      const h = { apikey: SB.key, "Content-Type": "application/json" }; if (SB.key.split(".").length === 3) h.Authorization = `Bearer ${SB.key}`;
+      const r = await fetch(`${SB.url}/storage/v1/object/sign/staff-photos`, { method: "POST", headers: h, body: JSON.stringify({ expiresIn: 3600, paths }) });
+      if (!r.ok) return out; const j = await r.json();
+      (Array.isArray(j) ? j : []).forEach(x => { if (x && x.path && x.signedURL && !x.error) { const u = SB.url + (x.signedURL.startsWith("/storage/v1") ? "" : "/storage/v1") + x.signedURL; if (u.startsWith(SB.url + "/storage/v1/object/sign/staff-photos/")) out[x.path] = u; } });
+    } catch (e) {}
+    return out;
+  }
+  const avatar = () => `<span class="scard__av" aria-hidden="true">${ico("users", 32)}</span>`;
+  const photoTag = (url, name) => (url ? `<img src="${esc(url)}" alt="${esc(lang === "fr" ? "Photo de " + name : "صورة " + name)}" width="600" height="750" loading="lazy" decoding="async" referrerpolicy="no-referrer" data-sp>` : avatar());
+  const bindPhotoFallback = root => root.querySelectorAll("img[data-sp]").forEach(i => i.addEventListener("error", () => i.replaceWith(Object.assign(document.createElement("span"), { className: "scard__av", innerHTML: ico("users", 32) })), { once: true }));
+  async function renderStaff(all) {
+    const urls = await signPhotos([...new Set(all.map(x => x.photo_path).filter(Boolean))]);
+    const catOf = x => x.staff_categories || { id: "none", name: "أخرى", name_fr: "Autres", sort_order: 9999 };
+    const cats = [...new Map(all.map(x => [catOf(x).id, catOf(x)])).values()].sort((a, b) => a.sort_order - b.sort_order);
+    const wrap = $("#teaGrid"); wrap.className = "sgrid-wrap"; $("#teaSubject").hidden = true; const f = $("#teaSearch").closest(".filters"); f.hidden = all.length < 8; f.style.gridTemplateColumns = "1fr";
+    let chips = $("#staffCats"); if (!chips) { chips = document.createElement("div"); chips.id = "staffCats"; chips.className = "chips"; chips.setAttribute("role", "group"); f.after(chips); }
+    let cur = "all";
+    chips.hidden = cats.length < 2;
+    chips.innerHTML = `<button type="button" class="chip" data-c="all" aria-pressed="true">${X("كل الفئات")}</button>` + cats.map(c => `<button type="button" class="chip" data-c="${esc(c.id)}" aria-pressed="false">${esc(L(c.name, c.name_fr))}</button>`).join("");
+    const card = x => { const nm = x.full_name, jt = L(x.job_title, x.job_title_fr), sp = L(x.specialty, x.specialty_fr), bio = L(x.bio, x.bio_fr);
+      return `<article class="scard"><button type="button" class="scard__b" data-staff="${esc(x.id)}" aria-haspopup="dialog"><span class="scard__ph">${photoTag(urls[x.photo_path], nm)}</span><span class="scard__t"><b>${esc(nm)}</b>${jt ? `<span>${esc(jt)}</span>` : ""}${sp ? `<small>${esc(sp)}</small>` : ""}${bio ? `<em>${esc(bio)}</em>` : ""}</span></button></article>`; };
+    const draw = () => {
+      const q = $("#teaSearch").value.trim().toLowerCase();
+      const rows = all.filter(x => (cur === "all" || catOf(x).id === cur) && (!q || x.full_name.toLowerCase().includes(q)));
+      wrap.innerHTML = !rows.length ? empty("جرّب تغيير الفلتر أو كلمات البحث.", "لا توجد نتائج")
+        : (cur === "all" && cats.length > 1 ? cats.map(c => { const g = rows.filter(x => catOf(x).id === c.id); return g.length ? `<div class="sgroup"><h3>${esc(L(c.name, c.name_fr))}</h3><div class="sgrid">${g.map(card).join("")}</div></div>` : ""; }).join("") : `<div class="sgrid">${rows.map(card).join("")}</div>`);
+      bindPhotoFallback(wrap);
+    };
+    chips.onclick = e => { const b = e.target.closest("[data-c]"); if (!b) return; cur = b.dataset.c; chips.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", c === b)); draw(); };
+    $("#teaSearch").oninput = draw;
+    wrap.onclick = e => {
+      const b = e.target.closest("[data-staff]"); if (!b) return; const x = all.find(y => y.id === b.dataset.staff), dlg = $("#staffDlg"); if (!x || !dlg) return;
+      const c = catOf(x), rows = [[X("الفئة"), L(c.name, c.name_fr)], [X("التخصص"), L(x.specialty, x.specialty_fr)], [X("القسم أو المجال"), L(x.department, x.department_fr)]].filter(r => r[1]);
+      $("#sdBody").innerHTML = `<div class="sd__ph">${photoTag(urls[x.photo_path], x.full_name)}</div><div class="sd__t"><h3 id="sdName">${esc(x.full_name)}</h3>${L(x.job_title, x.job_title_fr) ? `<p class="sd__job">${esc(L(x.job_title, x.job_title_fr))}</p>` : ""}<dl>${rows.map(r => `<dt>${esc(r[0])}</dt><dd>${esc(r[1])}</dd>`).join("")}</dl>${L(x.bio, x.bio_fr) ? `<p class="sd__bio">${esc(L(x.bio, x.bio_fr))}</p>` : ""}</div>`;
+      bindPhotoFallback(dlg); dlg.showModal(); $("#sdClose").focus();
+    };
+    draw();
   }
 
   /* ---------- الحياة المدرسية / الإنجازات / المرافق ---------- */
@@ -256,6 +319,8 @@
 
   /* ---------- الأساتذة ---------- */
   async function renderTeachers() {
+    const staff = live ? await api.list("staff") : [];
+    if (staff.length) { $("#demoTea").textContent = ""; return renderStaff(staff); }
     const all = await api.list("teachers");
     if (!all.length) { $("#teaSearch").closest(".filters").hidden = true; $("#teaGrid").innerHTML = empty("تُعرض أسماء الأساتذة والأطر هنا بعد اعتماد القائمة من الإدارة.", "أساتذة وأطر المؤسسة"); return; }
     $("#demoTea").textContent = DEMO ? R.site.demoNotice : "";
@@ -370,6 +435,7 @@
     });
     $("#sheet").addEventListener("click", e => (e.target.closest("a") || e.target.id === "sheet") && $("#sheet").close());
     document.addEventListener("click", e => { const b = e.target.closest("[data-share]"); if (b) share(b.dataset.share, location.origin + location.pathname + (b.dataset.url || "")); });
+    const sd = $("#staffDlg"); if (sd) { $("#sdClose").addEventListener("click", () => sd.close()); sd.addEventListener("click", e => { if (e.target === sd) sd.close(); }); }
     addEventListener("scroll", () => $("#header").classList.toggle("scrolled", scrollY > 8), { passive: true });
   }
   function applyLang() {
@@ -382,14 +448,14 @@
   /* تبديل اللغة: يعيد رسم كل الأقسام الديناميكية بالنص الجديد */
   addEventListener("razi:lang", async e => {
     lang = e.detail; applyLang(); renderNav(); renderContact();
-    await Promise.all([renderServices(), renderHome(), renderLife(), renderResources(), renderSchedule(), renderTeachers(), renderGallery()]);
+    await Promise.all([renderServices(), renderHome(), renderLife(), renderResources(), renderSchedule(), renderTeachers(), renderGallery(), renderClasses()]);
     renderStats(); observe(); if (window.V8) V8.translate();
   });
 
   (async () => {
     if (DEMO) { const b = document.createElement("div"); b.className = "demo-bar"; b.textContent = "وضع تجريبي محلي — بيانات غير رسمية"; document.body.prepend(b); }
     applyLang(); renderNav(); bindUI(); renderContact(); loadSettings().then(renderContact);
-    renderStats(); await Promise.all([renderServices(), renderHome(), renderLife(), renderResources(), renderSchedule(), renderTeachers(), renderGallery()]);
+    renderStats(); await Promise.all([renderServices(), renderHome(), renderLife(), renderResources(), renderSchedule(), renderTeachers(), renderGallery(), renderClasses()]);
     observe();
     if (location.hash.startsWith("#news/")) openArticle(decodeURIComponent(location.hash.slice(6)));
   })();

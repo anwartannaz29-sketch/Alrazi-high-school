@@ -1,4 +1,5 @@
 {
+  "id": "/",
   "name": "الثانوية التأهيلية الرازي",
   "short_name": "الرازي",
   "lang": "ar",
@@ -6,6 +7,7 @@
   "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",
+  "categories": ["education"],
   "background_color": "#FBF4E1",
   "theme_color": "#0A3AC0",
   "icons": [

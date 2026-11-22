@@ -14,7 +14,7 @@ PK = {"timetable_periods": ("timetable_id", "slot_no"), "timetable_entries": ("t
 class MockExt:
     """جداول Supabase العامة في المحاكي + RLS مبسّط + triggers/RPC لاستعمال الزمن + Storage."""
     def init_ext(s):
-        s.tables = {n: [] for n in ("timetables", "timetable_periods", "timetable_entries", "teachers", "resources", "gallery_items", "clubs", "achievements", "activities", "site_settings")}
+        s.tables = {n: [] for n in ("timetables", "timetable_periods", "timetable_entries", "teachers", "resources", "gallery_items", "clubs", "achievements", "activities", "site_settings", "school_statistics", "school_classes", "staff_categories", "staff_profiles")}
         s.uploads = []; s.counter = 0
     async def storage(s, route, req, u, is_admin, H):
         J = {**H, "content-type": "application/json"}

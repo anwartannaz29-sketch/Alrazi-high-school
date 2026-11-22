@@ -70,7 +70,7 @@
         <div class="stat"><b>${np}</b><small>أخبار منشورة</small></div><div class="stat"><b>${nd}</b><small>أخبار (مسودات)</small></div>
         <div class="stat"><b>${ap}</b><small>إعلانات منشورة</small></div><div class="stat"><b>${ad}</b><small>إعلانات (مسودات)</small></div></div>
         <h2 class="adm__h2">حالة النشر حسب القسم</h2>
-        <div class="sec-grid">${more.map(m => `<button type="button" class="sec-card" data-go="${m.sec.tab}"><b>${esc(m.sec.title)}</b>${m.off ? `<small class="warnline">غير مفعّل بعد (نفّذ الترحيل 002)</small>` : `<span class="sec-card__n"><span class="tag st-published">${m.p} منشور</span><span class="tag st-draft">${m.d} مسودة</span></span>`}</button>`).join("")}</div>
+        <div class="sec-grid">${more.map(m => `<button type="button" class="sec-card" data-go="${m.sec.tab}"><b>${esc(m.sec.title)}</b>${m.off ? `<small class="warnline">غير مفعّل بعد (نفّذ الترحيل ${m.sec.mig || "002"})</small>` : `<span class="sec-card__n"><span class="tag st-published">${m.p} منشور</span><span class="tag st-draft">${m.d} مسودة</span></span>`}</button>`).join("")}</div>
         <div class="row"><button class="btn btn--primary" data-go="news">إدارة الأخبار</button><button class="btn btn--primary" data-go="announcements">إدارة الإعلانات</button></div>`;
       v.querySelectorAll("[data-go]").forEach(b => (b.onclick = () => go(b.dataset.go)));
     } catch (e) { if (e.code !== "SESSION_EXPIRED") { v.innerHTML = `<p class="msg" role="alert">تعذّر تحميل الإحصائيات. <button class="btn btn--sm btn--primary" id="rt">إعادة المحاولة</button></p>`; $("#rt").onclick = dash; } }

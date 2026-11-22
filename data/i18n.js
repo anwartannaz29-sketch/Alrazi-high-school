@@ -79,3 +79,10 @@ RAZI.fr = {
   "دليل الرازي": "Guide Al-Razi", "المساعد": "Assistant"
 };
 /* ترجمة بعض مفاتيح قديمة (i18n.fr في site.js) تبقى كما هي */
+
+/* V10 — المؤسسة بالأرقام / الأقسام والمسالك / ملفات الأطر */
+Object.assign(RAZI.fr, {
+  "المؤسسة بالأرقام": "L'établissement en chiffres", "آخر تحديث": "Dernière mise à jour", "الأقسام والمسالك": "Classes et filières",
+  "عدد الأقسام المنشورة": "Classes publiées", "تلميذ": "élèves", "كل الفئات": "Toutes les catégories", "الفئة": "Catégorie", "التخصص": "Spécialité", "القسم أو المجال": "Département ou domaine",
+  "إغلاق": "Fermer"
+});

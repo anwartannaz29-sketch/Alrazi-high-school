@@ -24,6 +24,7 @@
 <link rel="stylesheet" href="css/fonts.css">
 <link rel="stylesheet" href="css/styles.css">
 <link rel="stylesheet" href="css/v8.css">
+<link rel="stylesheet" href="css/v10.css">
 </head>
 <body>
 <a class="skip" href="#main" data-x>تخطي إلى المحتوى</a>
@@ -153,7 +154,7 @@
     <div class="wrap"><div class="head"><h2 id="svcT" data-i18n="svcTitle">الخدمات المدرسية</h2></div><div class="svc" id="svcGrid"></div></div>
   </section>
 
-  <section class="stats" id="stats" aria-label="إحصائيات المؤسسة" data-x-aria hidden><div class="wrap"><div class="stats__grid" id="statsGrid"></div></div></section>
+  <section class="stats" id="stats" aria-labelledby="statsT" hidden><div class="wrap"><h2 class="stats__h" id="statsT" data-x>المؤسسة بالأرقام</h2><div class="stats__grid" id="statsGrid"></div><p class="stats__asof" id="statsAsOf" hidden></p></div></section>
 
   <section class="section today" id="today">
     <div class="wrap">
@@ -191,6 +192,13 @@
         <div class="ttg-wrap tt-gridmode" id="schGrid" hidden></div>
         <div class="tt-bar" id="schBar" hidden><span class="muted" id="schInfo"></span><button type="button" class="btn btn--outline btn--sm" id="schPrint"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V4h10v5M7 17H5a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-2M7 14h10v6H7z"/></svg><span data-x>طباعة / PDF</span></button></div>
       </div>
+    </div>
+  </section>
+
+  <section class="section section--tint" id="classes" aria-labelledby="clsT" hidden>
+    <div class="wrap">
+      <div class="head"><h2 id="clsT" data-x>الأقسام والمسالك</h2><span class="muted-count" id="clsCount"></span></div>
+      <div id="clsList"></div>
     </div>
   </section>
 
@@ -241,6 +249,8 @@
 
 <nav class="bottom" id="bottom" aria-label="التنقل السريع" data-x-aria></nav>
 <dialog id="sheet" class="sheet" aria-label="القائمة" data-x-aria><div class="sheet__in"><button class="sheet__x" type="button" aria-label="إغلاق" data-x-aria><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div id="sheetLinks"></div></div></dialog>
+
+<dialog id="staffDlg" class="sdlg" aria-labelledby="sdName"><div class="sdlg__in"><button class="sheet__x" type="button" id="sdClose" aria-label="إغلاق" data-x-aria><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div id="sdBody"></div></div></dialog>
 
 <dialog id="lightbox" class="lb" aria-label="عرض الصورة" data-x-aria>
   <div class="lb__bar"><span id="lbCount"></span><span><button type="button" class="lb__fs" aria-label="ملء الشاشة" data-x-aria><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button><button type="button" class="lb__x" aria-label="إغلاق" data-x-aria><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span></div>

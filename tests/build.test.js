@@ -39,4 +39,27 @@ check("vercel.json: admin CSP allows only self fonts/styles (no third-party font
 check("vercel.json: admin has CSP + no-store + noindex + DENY framing", ["Content-Security-Policy", "Cache-Control", "X-Robots-Tag", "X-Frame-Options"].every(k => adminH.includes(k)));
 const committed = fs.readFileSync(path.join(ROOT, "js/config.js"), "utf8");
 check("committed js/config.js is the empty/non-demo default", /"DEMO":false/.test(committed) && /"SUPABASE_URL":""/.test(committed));
+// ===== V10: SEO + اسم الحزمة + Push =====
+{
+  const pk = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"));
+  check("V10: package name razi-school-v10 / version 10.x", pk.name === "razi-school-v10" && /^10\./.test(pk.version));
+  const seo = fs.mkdtempSync(path.join(os.tmpdir(), "seo10-")), cfgOut = path.join(seo, "c.js");
+  for (const f of ["index.html", "about.html", "privacy.html", "assistant.html"]) fs.copyFileSync(path.join(ROOT, f), path.join(seo, f));
+  const go = () => spawnSync("node", ["scripts/build-config.js"], { cwd: ROOT, env: { PATH: process.env.PATH, CONFIG_OUT: cfgOut, SEO_OUT_DIR: seo, SITE_URL: "https://razi.example.com", GOOGLE_SITE_VERIFICATION: "abc_123" }, encoding: "utf8" });
+  let r2 = go(); go();   // مرتان: يجب أن يبقى الحقن idempotent
+  const ix = fs.readFileSync(path.join(seo, "index.html"), "utf8"), ab = fs.readFileSync(path.join(seo, "about.html"), "utf8");
+  check("V10: index.html gets canonical + og:url + WebSite JSON-LD + verification meta, exactly once", r2.status === 0 && (ix.match(/rel="canonical"/g) || []).length === 1 && ix.includes('href="https://razi.example.com/"') && ix.includes('"@type":"WebSite"') && ix.includes('google-site-verification" content="abc_123"') && (ix.match(/seo:start/g) || []).length === 1);
+  check("V10: og:image becomes absolute", /og:image" content="https:\/\/razi\.example\.com\/assets\//.test(ix));
+  check("V10: about.html canonical points at /about.html (no WebSite JSON-LD duplicate)", ab.includes('href="https://razi.example.com/about.html"') && !ab.includes('"@type":"WebSite"'));
+  const sm = fs.readFileSync(path.join(seo, "sitemap.xml"), "utf8"), rb = fs.readFileSync(path.join(seo, "robots.txt"), "utf8");
+  check("V10: sitemap lists 4 public pages with lastmod, never admin/notifications", ["/", "/about.html", "/assistant.html", "/privacy.html"].every(u => sm.includes("https://razi.example.com" + u + "</loc>")) && /<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/.test(sm) && !/admin|notifications/.test(sm));
+  check("V10: robots blocks /admin/ and /api/, links the sitemap", /Disallow: \/admin\//.test(rb) && /Disallow: \/api\//.test(rb) && /Sitemap: https:\/\/razi\.example\.com\/sitemap\.xml/.test(rb));
+  const bad = spawnSync("node", ["scripts/build-config.js"], { cwd: ROOT, env: { PATH: process.env.PATH, CONFIG_OUT: cfgOut, SEO_OUT_DIR: seo, SITE_URL: "https://razi.example.com", GOOGLE_SITE_VERIFICATION: '"><script>x' }, encoding: "utf8" });
+  check("V10: verification token is sanitized (no HTML injection)", !/<script>x/.test(fs.readFileSync(path.join(seo, "index.html"), "utf8")) && bad.status === 0);
+  const sw = fs.readFileSync(path.join(ROOT, "service-worker.js"), "utf8"), ps = fs.readFileSync(path.join(ROOT, "api/push-send.js"), "utf8");
+  check("V10: service worker re-subscribes on pushsubscriptionchange", /pushsubscriptionchange/.test(sw) && /action: "subscribe"/.test(sw));
+  check("V10: push TTL is 7 days (offline devices still receive later)", /TTL: 604800/.test(ps));
+  check("V10: manifest has id + standalone display", /"id": "\/"/.test(fs.readFileSync(path.join(ROOT, "manifest.webmanifest"), "utf8")));
+  check("V10: source HTML stays clean (SEO injected only at build)", !/seo:start/.test(fs.readFileSync(path.join(ROOT, "index.html"), "utf8")));
+}
 console.log(`\n${pass} passed, ${bad} failed`); process.exit(bad ? 1 : 0);

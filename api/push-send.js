@@ -43,7 +43,7 @@ async function handler(req, res, deps) {
 
     const l = await rpc(cfg, fetchFn, "admin_list_push_subscriptions", { p_limit: 3000 }, token);
     if (!l.ok || !Array.isArray(l.data)) { await unclaim(); return fail(res, 502, "storage_error"); }
-    const subs = l.data, bad = [], opts = { TTL: 86400, urgency: n.priority === "normal" ? "normal" : "high", timeout: 5000 };
+    const subs = l.data, bad = [], opts = { TTL: 604800, urgency: n.priority === "normal" ? "normal" : "high", timeout: 5000 };
     webpush.setVapidDetails(subj, pub, priv);
     let delivered = 0, failed = 0; const payloads = { ar: payloadFor(n, "ar"), fr: payloadFor(n, "fr") };
     for (let i = 0; i < subs.length; i += CHUNK) {

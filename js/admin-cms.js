@@ -68,7 +68,10 @@
     const lbl = `${esc(f.l)}${f.req ? " *" : ""}`;
     if (f.t === "textarea") return `<label class="f">${lbl}<textarea name="${f.k}" rows="3" ${f.max ? `maxlength="${f.max}"` : ""}>${esc(v)}</textarea></label>`;
     if (f.t === "select") return `<label class="f">${lbl}<select name="${f.k}">${f.opts.map(([val, l]) => `<option value="${esc(val)}" ${val === v ? "selected" : ""}>${esc(l)}</option>`).join("")}</select></label>`;
-    if (f.t === "number") return `<label class="f">${lbl}<input name="${f.k}" type="number" min="-9999" max="9999" value="${esc(v ?? 0)}"></label>`;
+    if (f.t === "check") return `<label class="f f--chk"><input type="checkbox" name="${f.k}" ${v === true ? "checked" : ""}> <span>${esc(f.l)}</span></label>`;
+    if (f.t === "photo") return `<div class="f upl" data-photo="${f.k}"><span>${lbl}</span><div class="upl__cur" data-pcur ${v ? "" : "hidden"}><img class="thumb thumb--tall" alt="" hidden><label class="f f--chk"><input type="checkbox" name="${f.k}__rm"> إزالة الصورة</label></div>
+        <input type="file" name="${f.k}__file" accept="image/jpeg,image/png,image/webp"><small>JPG / PNG / WebP حتى 2MB — تُحوَّل تلقائيًا إلى WebP بمقاس 600×750 وحجم مستهدف 100–180KB</small><p class="note" data-pinfo hidden></p></div>`;
+    if (f.t === "number") return `<label class="f">${lbl}<input name="${f.k}" type="number" min="${f.min ?? -9999}" max="${f.max ?? 9999}" value="${esc(v ?? (f.nullable ? "" : 0))}"></label>`;
     if (f.t === "date") return `<label class="f">${lbl}<input name="${f.k}" type="date" value="${esc(v || "")}"></label>`;
     if (f.t === "image" || f.t === "file") {
       const acc = f.t === "image" ? IMG.join(",") : DOC.join(","), max = f.t === "image" ? 8 : 10;
@@ -78,11 +81,19 @@
     return `<label class="f">${lbl}<input name="${f.k}" type="text" ${f.max ? `maxlength="${f.max}"` : ""} ${f.ph ? `placeholder="${esc(f.ph)}"` : ""} value="${esc(v)}"></label>`;
   }
   async function form(cfg, row) {
+    if (cfg.prepare) await cfg.prepare(row);
     const d = row || {}; const def = { kind: cfg.fields.find(f => f.k === "kind")?.opts?.[0]?.[0] };
-    return modal({ title: `${row ? "تعديل" : "إضافة"} ${cfg.one}`, wide: true, body: cfg.fields.map(f => fieldHTML(f, d[f.k] ?? def[f.k] ?? "")).join("") + `<label class="f">الحالة<select name="status"><option value="draft" ${!row || d.status === "draft" ? "selected" : ""}>مسودة (غير ظاهرة للزوار)</option><option value="published" ${d.status === "published" ? "selected" : ""}>منشور</option><option value="archived" ${d.status === "archived" ? "selected" : ""}>مؤرشف</option></select></label>${cfg.note ? `<p class="note">${esc(cfg.note)}</p>` : ""}`,
+    const pm = modal({ title: `${row ? "تعديل" : "إضافة"} ${cfg.one}`, wide: true, body: cfg.fields.map(f => fieldHTML(f, d[f.k] ?? def[f.k] ?? "")).join("") + `<label class="f">الحالة<select name="status"><option value="draft" ${!row || d.status === "draft" ? "selected" : ""}>مسودة (غير ظاهرة للزوار)</option><option value="published" ${d.status === "published" ? "selected" : ""}>منشور</option><option value="archived" ${d.status === "archived" ? "selected" : ""}>مؤرشف</option></select></label>${cfg.note ? `<p class="note">${esc(cfg.note)}</p>` : ""}`,
       onSubmit: async (f, fail) => {
-        const body = {}, stale = [];
+        const body = {}, stale = [], stalePhoto = [], fresh = [];
         for (const fl of cfg.fields) {
+          if (fl.t === "check") { body[fl.k] = f.elements[fl.k].checked; continue; }
+          if (fl.t === "photo") {
+            const file = f.elements[fl.k + "__file"].files[0], rm = f.elements[fl.k + "__rm"].checked;
+            if (file) { if (!body.id && !row) body.id = crypto.randomUUID(); const np = await fl.handler.put(row ? row.id : body.id, file); fresh.push([fl, np]); body[fl.k] = np; if (d[fl.k]) stalePhoto.push([fl, d[fl.k]]); }
+            else if (rm) { body[fl.k] = null; if (d[fl.k]) stalePhoto.push([fl, d[fl.k]]); } else body[fl.k] = row ? d[fl.k] ?? null : null;
+            continue;
+          }
           if (fl.t === "image" || fl.t === "file") {
             const file = f.elements[fl.k + "__file"].files[0], rm = f.elements[fl.k + "__rm"] && f.elements[fl.k + "__rm"].checked;
             if (file) { body[fl.k] = await uploadFile(file, fl.t, fl.folder); if (d[fl.k]) stale.push(d[fl.k]); }
@@ -91,23 +102,27 @@
           } else {
             let v = f.elements[fl.k].value.trim();
             if (fl.req && !v) return fail(`${fl.l} مطلوب.`);
-            if (fl.t === "number") v = v === "" ? 0 : Math.trunc(Number(v)); else if (fl.t === "date" || fl.t === "textarea" || (fl.t === "text" && !fl.req)) v = v || null;
-            if (fl.t === "number" && (!Number.isFinite(v) || Math.abs(v) > 9999)) return fail("الترتيب رقم بين -9999 و9999.");
+            if (fl.t === "number") v = v === "" ? (fl.nullable ? null : 0) : Math.trunc(Number(v)); else if (fl.t === "date" || fl.t === "textarea" || (fl.t === "text" && !fl.req) || (fl.t === "select" && fl.nullable)) v = v || null;
+            if (fl.t === "number" && v !== null && (!Number.isFinite(v) || v < (fl.min ?? -9999) || v > (fl.max ?? 9999))) return fail(`${fl.l}: رقم بين ${fl.min ?? -9999} و${fl.max ?? 9999}.`);
             body[fl.k] = v;
           }
         }
         body.status = f.elements.status.value;
         if (cfg.needsFileToPublish && body.status === "published" && !body[cfg.needsFileToPublish]) return fail("ارفع الملف قبل نشر هذا المورد (أو احفظه كمسودة).");
-        if (row) await db(`${cfg.table}?id=eq.${Q(row.id)}`, { method: "PATCH", body }); else await db(cfg.table, { method: "POST", body });
-        stale.forEach(removeFile); toast("تم الحفظ بنجاح.");
+        if (cfg.validate) { const bad = cfg.validate(body, row); if (bad) { fresh.forEach(([fl, pth]) => fl.handler.remove(pth)); return fail(bad); } }
+        try { if (row) await db(`${cfg.table}?id=eq.${Q(row.id)}`, { method: "PATCH", body }); else await db(cfg.table, { method: "POST", body }); }
+        catch (er) { fresh.forEach(([fl, pth]) => fl.handler.remove(pth)); throw er; }   // فشل الحفظ: لا ملفات يتيمة
+        stale.forEach(removeFile); stalePhoto.forEach(([fl, pth]) => fl.handler.remove(pth)); toast("تم الحفظ بنجاح.");   // القديمة تُحذف فقط بعد نجاح الحفظ
       } });
+    const dlg = [...document.querySelectorAll("dialog.adlg[open]")].pop(); if (dlg && cfg.onOpen) cfg.onOpen(dlg, d);
+    return pm;
   }
 
   /* ---------- العرض العام للقسم ---------- */
   function view(root, cfg) {
     let rows = [], more = false;
     root.innerHTML = `<div class="head"><h1>${esc(cfg.title)}</h1><button class="btn btn--primary btn--sm" data-add>${ADM.svg("plus")}<span>إضافة ${esc(cfg.one)}</span></button></div>${cfg.note ? `<p class="note">${esc(cfg.note)}</p>` : ""}
-      <div class="tools-row"><input type="search" data-q placeholder="بحث…" aria-label="بحث"><select data-st aria-label="الحالة"><option value="">كل الحالات</option><option value="draft">مسودة</option><option value="published">منشور</option><option value="archived">مؤرشف</option></select></div><div data-list><p>جارٍ التحميل…</p></div>`;
+      <div class="tools-row"><input type="search" data-q placeholder="بحث…" aria-label="بحث"><select data-st aria-label="الحالة"><option value="">كل الحالات</option><option value="draft">مسودة</option><option value="published">منشور</option><option value="archived">مؤرشف</option></select></div><div data-extra></div><div data-list><p>جارٍ التحميل…</p></div>`;
     const list = root.querySelector("[data-list]"), qEl = root.querySelector("[data-q]"), stEl = root.querySelector("[data-st]");
     async function load(append = false) {
       const q = qEl.value.replace(/[*%,()]/g, " ").trim(), st = stEl.value, off = append ? rows.length : 0;
@@ -115,10 +130,12 @@
       if (q) path += `&${cfg.search}=ilike.*${Q(q)}*`; if (st) path += `&status=eq.${st}`;
       try {
         const b = await db(path); more = b.length > PAGE; rows = (append ? rows : []).concat(b.slice(0, PAGE));
-        list.innerHTML = rows.length ? rows.map(r => `<article class="arow">${cfg.thumb && r[cfg.thumb] ? `<img class="thumb" src="${esc(r[cfg.thumb])}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ""}<div class="arow__m"><b>${esc(cfg.titleOf(r))}</b><small>${esc(cfg.sum(r))} · آخر تعديل: ${fmt(r.updated_at)}</small></div>
+        list.innerHTML = rows.length ? rows.map(r => `<article class="arow">${cfg.thumbPath ? `<span class="thumb thumb--ph" data-sp="${esc(r[cfg.thumbPath] || "")}"></span>` : ""}${cfg.thumb && r[cfg.thumb] ? `<img class="thumb" src="${esc(r[cfg.thumb])}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ""}<div class="arow__m"><b>${esc(cfg.titleOf(r))}</b><small>${esc(cfg.sum(r))} · آخر تعديل: ${fmt(r.updated_at)}</small></div>
           <span class="tag st-${esc(r.status)}">${ST[r.status] || esc(r.status)}</span><div class="arow__a"><button data-cms="edit" data-id="${esc(r.id)}">تعديل</button>
-          ${r.status === "published" ? `<button data-cms="draft" data-id="${esc(r.id)}">إلغاء النشر</button>` : `<button data-cms="published" data-id="${esc(r.id)}">نشر</button>`}${r.status !== "archived" ? `<button data-cms="archived" data-id="${esc(r.id)}">أرشفة</button>` : ""}<button class="del" data-cms="delete" data-id="${esc(r.id)}">حذف</button></div></article>`).join("") + (more ? `<p class="center"><button class="btn btn--primary btn--sm" data-more type="button">تحميل المزيد</button></p>` : "")
+          ${r.status === "published" ? `<button data-cms="draft" data-id="${esc(r.id)}">إلغاء النشر</button>` : `<button data-cms="published" data-id="${esc(r.id)}">نشر</button>`}${r.status !== "archived" ? `<button data-cms="archived" data-id="${esc(r.id)}">أرشفة</button>` : `<button data-cms="draft" data-id="${esc(r.id)}">استعادة</button>`}<button class="del" data-cms="delete" data-id="${esc(r.id)}">حذف</button></div></article>`).join("") + (more ? `<p class="center"><button class="btn btn--primary btn--sm" data-more type="button">تحميل المزيد</button></p>` : "")
           : `<p class="empty"><b>${q || st ? "لا توجد نتائج مطابقة" : "لا توجد عناصر بعد"}</b><small>${q || st ? "" : `اضغط «إضافة ${esc(cfg.one)}».`}</small></p>`;
+        if (cfg.thumbPath && cfg.signer) { const ps = [...new Set(rows.map(r => r[cfg.thumbPath]).filter(Boolean))]; cfg.signer(ps).then(m => list.querySelectorAll("[data-sp]").forEach(el => { const u = m[el.dataset.sp]; if (u) { const i = document.createElement("img"); i.className = "thumb"; i.alt = ""; i.loading = "lazy"; i.src = u; el.replaceWith(i); } })).catch(() => {}); }
+        if (cfg.extra) cfg.extra(root.querySelector("[data-extra]"), rows);
       } catch (e) { if (e.code !== "SESSION_EXPIRED") { list.innerHTML = `<p class="msg" role="alert">${ADM.apiErr(e)} <button class="btn btn--sm btn--primary" data-retry>إعادة المحاولة</button></p>`; } }
     }
     let t; qEl.oninput = () => { clearTimeout(t); t = setTimeout(() => load(), 300); }; stEl.onchange = () => load();
@@ -128,13 +145,15 @@
       const b = e.target.closest("[data-cms]"); if (!b) return; const r = rows.find(x => x.id === b.dataset.id), act = b.dataset.cms; if (!r) return;
       if (act === "edit") { if (await form(cfg, r)) load(); return; }
       try {
-        if (act === "delete") { if (await confirmBox(`سيُحذف «${cfg.titleOf(r)}» نهائيًا ولا يمكن التراجع.`, "حذف نهائي", true)) { busy(b, true); await db(`${cfg.table}?id=eq.${Q(r.id)}`, { method: "DELETE" }); for (const f of cfg.fields) if ((f.t === "image" || f.t === "file") && r[f.k]) removeFile(r[f.k]); toast("تم الحذف."); load(); } return; }
+        if (act === "delete") { if (await confirmBox(`سيُحذف «${cfg.titleOf(r)}» نهائيًا ولا يمكن التراجع.`, "حذف نهائي", true)) { busy(b, true); await db(`${cfg.table}?id=eq.${Q(r.id)}`, { method: "DELETE" }); for (const f of cfg.fields) { if ((f.t === "image" || f.t === "file") && r[f.k]) removeFile(r[f.k]); if (f.t === "photo" && r[f.k]) f.handler.remove(r[f.k]); } toast("تم الحذف."); load(); } return; }
         if (act === "published" && cfg.needsFileToPublish && !r[cfg.needsFileToPublish]) return toast("ارفع الملف أولًا (تعديل) ثم انشر.", true);
+        if (act === "published" && cfg.validate) { const bad = cfg.validate({ ...r, status: "published" }, r); if (bad) return toast(bad, true); }
         busy(b, true); await db(`${cfg.table}?id=eq.${Q(r.id)}`, { method: "PATCH", body: { status: act } }); toast("تم تحديث الحالة."); load();
       } catch (er) { busy(b, false); if (er.code !== "SESSION_EXPIRED") toast(ADM.apiErr(er), true); }
     };
     load();
   }
+  window.ADM.cms = { view, T, A, Sel, opt, Q, userErr, sniff, ST };   // يستعمله js/admin-inst.js
   for (const key of ["resources", "teachers", "achievements"]) window.ADM.views[key] = root => view(root, CFG[key]);
   window.ADM.views.gallery = root => view(root, CFG.gallery_items);
   window.ADM.views.life = root => {

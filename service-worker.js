@@ -31,3 +31,18 @@ self.addEventListener("notificationclick", e => {
     await self.clients.openWindow(url);
   })());
 });
+
+/* V10: عند تدوير المتصفح للاشتراك (pushsubscriptionchange) نعيد الاشتراك تلقائيًا كي لا يتوقف الوصول بصمت. لا بيانات شخصية. */
+self.addEventListener("pushsubscriptionchange", e => {
+  e.waitUntil((async () => {
+    try {
+      const k = await (await fetch("/api/push-subscription", { cache: "no-store", credentials: "omit" })).json();
+      if (!k || !k.publicKey) return;
+      const p = "=".repeat((4 - (k.publicKey.length % 4)) % 4), raw = atob((k.publicKey + p).replace(/-/g, "+").replace(/_/g, "/"));
+      const sub = (e.newSubscription) || await self.registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: Uint8Array.from(raw, c => c.charCodeAt(0)) });
+      const j = sub.toJSON();
+      await fetch("/api/push-subscription", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "omit",
+        body: JSON.stringify({ action: "subscribe", endpoint: sub.endpoint, keys: j.keys, lang: "ar" }) });
+    } catch (err) {}
+  })());
+});
