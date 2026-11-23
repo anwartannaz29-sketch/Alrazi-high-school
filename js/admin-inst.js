@@ -95,6 +95,7 @@
   for (const [k, mig] of [["stats", 0], ["classes", 0], ["staff_categories", 0], ["staff", 0]]) window.ADM.sections.push({ table: CFG[k].table, title: CFG[k].title, tab: "inst", mig: "004" });
 
   window.ADM.views.inst = async root => {
+    for (const h of ["onclick", "oninput", "onchange", "onsubmit", "onkeydown"]) root[h] = null;   // معالجات الأقسام الأخرى (الإشعارات/الجداول) تبقى على #view وإلا تفتح نماذجها هنا
     root.innerHTML = "<p>جارٍ التحميل…</p>";
     try { await db("school_statistics?select=id&limit=1"); } catch (e) {
       if (e.code === "SESSION_EXPIRED") return;
